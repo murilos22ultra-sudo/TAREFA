@@ -1,8 +1,6 @@
-// ===== ESTADO GLOBAL =====
 let checklistTemp = [];
 let tarefas = JSON.parse(localStorage.getItem("tarefas")) || [];
 
-// ===== MODAL =====
 function abrirModal() {
   document.getElementById("modal").classList.remove("hidden");
 }
@@ -11,14 +9,11 @@ function fecharModal() {
   document.getElementById("modal").classList.add("hidden");
 }
 
-// ===== CHECKLIST NO MODAL =====
 function addChecklist() {
   const input = document.getElementById("check-item");
-  const texto = input.value.trim();
+  if (!input.value.trim()) return;
 
-  if (!texto) return;
-
-  checklistTemp.push({ texto, ok: false });
+  checklistTemp.push({ texto: input.value, ok: false });
   input.value = "";
   renderChecklistTemp();
 }
@@ -26,7 +21,6 @@ function addChecklist() {
 function renderChecklistTemp() {
   const ul = document.getElementById("lista-checklist");
   ul.innerHTML = "";
-
   checklistTemp.forEach(item => {
     const li = document.createElement("li");
     li.textContent = item.texto;
@@ -34,65 +28,47 @@ function renderChecklistTemp() {
   });
 }
 
-// ===== CRIAR TAREFA =====
 function criarTarefa() {
-  const tituloInput = document.getElementById("titulo");
-  const prioridadeSelect = document.getElementById("prioridade");
-
-  const titulo = tituloInput.value.trim();
-  const prioridade = prioridadeSelect.value;
+  const titulo = document.getElementById("titulo").value.trim();
+  const prioridade = document.getElementById("prioridade").value;
 
   if (!titulo) {
-    alert("Digite um título para a tarefa.");
+    alert("Digite um título");
     return;
   }
 
   tarefas.push({
     titulo,
     prioridade,
-    checklist: [...checklistTemp],
+    checklist: checklistTemp,
     status: "A Fazer"
   });
 
-  // Resetar formulário
   checklistTemp = [];
-  tituloInput.value = "";
-  document.getElementById("check-item").value = "";
+  document.getElementById("titulo").value = "";
   renderChecklistTemp();
-
   salvar();
   fecharModal();
 }
 
-// ===== SALVAR E RENDERIZAR =====
 function salvar() {
   localStorage.setItem("tarefas", JSON.stringify(tarefas));
   render();
 }
 
 function render() {
-  document.querySelectorAll(".cards").forEach(c => (c.innerHTML = ""));
+  document.querySelectorAll(".cards").forEach(c => c.innerHTML = "");
 
-  tarefas.forEach(tarefa => {
+  tarefas.forEach(t => {
     const card = document.createElement("div");
     card.className = "card";
-
-    card.innerHTML = `
-      <strong>${tarefa.titulo}</strong>
-      <div class="detalhes">▶ Detalhes</div>
-    `;
-
-    // Badge de prioridade
-    const badge = document.createElement("span");
-    badge.className = `badge ${tarefa.prioridade}`;
-    badge.textContent = tarefa.prioridade;
-    card.appendChild(badge);
+    card.innerHTML = `<strong>${t.titulo}</strong>`;
 
     document
-      .querySelector(\`[data-status="\${tarefa.status}"] .cards\`)
+      .querySelector(`[data-status="${t.status}"] .cards`)
       .appendChild(card);
   });
 }
 
-// ===== INICIALIZAÇÃO =====
 render();
+``
