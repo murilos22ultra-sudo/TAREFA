@@ -1,6 +1,8 @@
+// ===== ESTADO GLOBAL =====
 let checklistTemp = [];
 let tarefas = JSON.parse(localStorage.getItem("tarefas")) || [];
 
+// ===== MODAL =====
 function abrirModal() {
   document.getElementById("modal").classList.remove("hidden");
 }
@@ -9,12 +11,14 @@ function fecharModal() {
   document.getElementById("modal").classList.add("hidden");
 }
 
-/* CHECKLIST */
+// ===== CHECKLIST NO MODAL =====
 function addChecklist() {
   const input = document.getElementById("check-item");
-  if (!input.value) return;
+  const texto = input.value.trim();
 
-  checklistTemp.push({ texto: input.value, ok: false });
+  if (!texto) return;
+
+  checklistTemp.push({ texto, ok: false });
   input.value = "";
   renderChecklistTemp();
 }
@@ -23,51 +27,72 @@ function renderChecklistTemp() {
   const ul = document.getElementById("lista-checklist");
   ul.innerHTML = "";
 
-  checklistTemp.forEach(i => {
+  checklistTemp.forEach(item => {
     const li = document.createElement("li");
-    li.textContent = i.texto;
+    li.textContent = item.texto;
     ul.appendChild(li);
   });
 }
 
-/* TAREFA */
+// ===== CRIAR TAREFA =====
 function criarTarefa() {
-  const titulo = document.getElementById("titulo").value;
-  const prioridade = document.getElementById("prioridade").value;
-  if (!titulo) return;
+  const tituloInput = document.getElementById("titulo");
+  const prioridadeSelect = document.getElementById("prioridade");
+
+  const titulo = tituloInput.value.trim();
+  const prioridade = prioridadeSelect.value;
+
+  if (!titulo) {
+    alert("Digite um título para a tarefa.");
+    return;
+  }
 
   tarefas.push({
     titulo,
     prioridade,
-    checklist: checklistTemp,
+    checklist: [...checklistTemp],
     status: "A Fazer"
   });
 
+  // Resetar formulário
   checklistTemp = [];
-  document.getElementById("titulo").value = "";
+  tituloInput.value = "";
+  document.getElementById("check-item").value = "";
   renderChecklistTemp();
+
   salvar();
   fecharModal();
 }
 
+// ===== SALVAR E RENDERIZAR =====
 function salvar() {
   localStorage.setItem("tarefas", JSON.stringify(tarefas));
   render();
 }
 
 function render() {
-  document.querySelectorAll(".cards").forEach(c => c.innerHTML = "");
+  document.querySelectorAll(".cards").forEach(c => (c.innerHTML = ""));
 
-  tarefas.forEach(t => {
+  tarefas.forEach(tarefa => {
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `<strong>${t.titulo}</strong>`;
+
+    card.innerHTML = `
+      <strong>${tarefa.titulo}</strong>
+      <div class="detalhes">▶ Detalhes</div>
+    `;
+
+    // Badge de prioridade
+    const badge = document.createElement("span");
+    badge.className = `badge ${tarefa.prioridade}`;
+    badge.textContent = tarefa.prioridade;
+    card.appendChild(badge);
 
     document
-      .querySelector(`[data-status="${t.status}"] .cards`)
+      .querySelector(\`[data-status="\${tarefa.status}"] .cards\`)
       .appendChild(card);
   });
 }
 
+// ===== INICIALIZAÇÃO =====
 render();
-``
