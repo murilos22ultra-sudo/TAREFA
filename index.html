@@ -6,151 +6,163 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Arial;
-  background:radial-gradient(circle at top,#0b1324,#05070f);
-  color:#fff
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, Segoe UI, Arial;
+  background: radial-gradient(circle at top, #0b1324, #05070f);
+  color: #e5e7eb;
 }
 
-/* ===== HEADER ===== */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:24px 40px
-}
-header h1{margin:0;font-size:28px}
-.header-actions{display:flex;gap:12px}
-.btn{
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-  font-size:14px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:6px
-}
-.btn.blue{background:#2563eb;color:#fff}
-.btn.green{background:#16a34a;color:#fff}
-.btn.red{background:#dc2626;color:#fff}
-
-/* ===== KANBAN ===== */
-.kanban{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:32px;
-  padding:0 40px 40px
-}
-.coluna{
-  background:linear-gradient(180deg,#0f172a,#020617);
-  border-radius:14px;
-  padding:20px;
-  min-height:260px;
-  box-shadow:0 10px 30px rgba(0,0,0,.35)
-}
-.coluna h2{margin-top:0;font-size:16px}
-
-/* ===== CARD ===== */
-.card{
-  background:linear-gradient(180deg,#1f2937,#111827);
-  border-radius:10px;
-  padding:14px 16px;
-  margin-bottom:12px;
-  box-shadow:0 6px 16px rgba(0,0,0,.4);
-  border-left:4px solid #facc15;
-}
-.card.red{border-left-color:#ef4444}
-.card.yellow{border-left-color:#facc15}
-.card.green{border-left-color:#22c55e}
-
-.card-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center
-}
-.card-title{font-weight:600;font-size:14px}
-
-.badge{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:600
-}
-.badge.Alta{background:#dc2626}
-.badge.Média{background:#facc15;color:#111827}
-.badge.Baixa{background:#22c55e}
-
-/* ===== DETAILS ===== */
-.details{
-  font-size:12px;
-  color:#c7d2fe;
-  cursor:pointer;
-  margin-top:6px
-}
-.details:hover{text-decoration:underline}
-
-.detail-box.hidden{display:none}
-
-.check{
-  display:flex;
-  gap:6px;
-  font-size:12px;
-  align-items:center
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 40px;
 }
 
-.progress-text{font-size:12px;margin-top:4px}
-.bar{
-  background:#334155;
-  height:6px;
-  border-radius:4px;
-  overflow:hidden
-}
-.bar div{
-  height:100%;
-  background:#22c55e
+header h1 {
+  margin: 0;
+  font-size: 28px;
 }
 
-.actions{
-  display:flex;
-  gap:6px;
-  margin-top:8px
+/* BOTÕES */
+.btn {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-/* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  display:flex;
-  align-items:center;
-  justify-content:center
-}
-.hidden{display:none}
+.btn.blue { background: #2563eb; color: #fff; }
+.btn.green { background: #16a34a; color: #fff; }
+.btn.gray { background: #334155; color: #e5e7eb; }
+.btn.red { background: #dc2626; color: #fff; }
 
-.modal-box{
+.header-actions { display: flex; gap: 12px; }
+
+/* KANBAN */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 32px;
+  padding: 0 40px 40px;
+}
+
+.coluna {
+  background: linear-gradient(180deg,#0f172a,#020617);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.coluna h2 {
+  margin-top: 0;
+  font-size: 16px;
+}
+
+/* CARD */
+.card {
+  background: linear-gradient(180deg,#1f2937,#111827);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border-left: 4px solid #facc15;
+}
+
+.card.red { border-left-color:#ef4444; }
+.card.yellow { border-left-color:#facc15; }
+.card.green { border-left-color:#22c55e; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-title { font-weight: 600; font-size: 14px; }
+
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.badge.Alta { background:#dc2626; }
+.badge.Média { background:#facc15; color:#111827; }
+.badge.Baixa { background:#22c55e; }
+
+.details {
+  font-size: 12px;
+  color: #c7d2fe;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.detail-box.hidden { display: none; }
+
+.check {
+  font-size: 12px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden { display: none; }
+
+.modal-box {
   background:#020617;
+  border-radius:14px;
   padding:24px;
-  width:340px;
-  border-radius:14px
+  width:420px;
 }
-.modal-box h3{margin-top:0}
-.modal-box input,
-.modal-box select{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  margin-bottom:10px;
-  background:#111827;
-  color:#fff
-}
-.row{display:flex;gap:6px}
 
-@media(max-width:1000px){
-  .kanban{grid-template-columns:1fr}
+.modal-box input,
+.modal-box textarea,
+.modal-box select {
+  width: 100%;
+  background:#1e293b;
+  border:none;
+  border-radius:8px;
+  padding:12px;
+  color:#e5e7eb;
+  margin-bottom:12px;
+}
+
+.modal-box textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.check-row {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
 }
 </style>
 </head>
@@ -161,7 +173,7 @@ header h1{margin:0;font-size:28px}
   <h1>TAREFAS</h1>
   <div class="header-actions">
     <button class="btn blue" id="btnNovo">+ Criar tarefa</button>
-    <button class="btn green" id="btnExport">⬇ Exportar Excel</button>
+    <button class="btn green" id="btnExport">Exportar Excel</button>
   </div>
 </header>
 
@@ -174,24 +186,26 @@ header h1{margin:0;font-size:28px}
 <!-- MODAL -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
-    <h3 id="modalTitle">Criar tarefa</h3>
+    <h3 id="modalTitle">Cadastrar atividade</h3>
 
-    <input id="titleInput" placeholder="Título">
-    <select id="priorityInput">
+    <input id="taskTitle" placeholder="Título">
+    <textarea id="taskDesc" placeholder="Descrição"></textarea>
+    <input id="taskDate" type="date">
+    <select id="taskPriority">
+      <option>Média</option>
       <option>Alta</option>
-      <option selected>Média</option>
       <option>Baixa</option>
     </select>
 
-    <div class="row">
-      <input id="checkInput" placeholder="Checklist">
-      <button class="btn blue" id="addCheck">+</button>
+    <div class="check-row">
+      <input id="checkInput" placeholder="Item do checklist">
+      <button class="btn gray" id="addCheck">Adicionar</button>
     </div>
 
-    <div id="tempChecks"></div>
+    <div id="checkPreview"></div>
 
-    <div class="row" style="margin-top:12px">
-      <button class="btn" id="cancel">Cancelar</button>
+    <div class="modal-actions">
+      <button class="btn gray" id="cancel">Cancelar</button>
       <button class="btn blue" id="save">Salvar</button>
     </div>
   </div>
@@ -199,76 +213,99 @@ header h1{margin:0;font-size:28px}
 
 <script>
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let tempChecks = [];
-let editingId = null;
+let checklistTemp = [];
+let editId = null;
 
 const modal = document.getElementById("modal");
-const modalTitle = document.getElementById("modalTitle");
-const titleInput = document.getElementById("titleInput");
-const priorityInput = document.getElementById("priorityInput");
+const titleInput = document.getElementById("taskTitle");
+const descInput = document.getElementById("taskDesc");
+const dateInput = document.getElementById("taskDate");
+const priorityInput = document.getElementById("taskPriority");
 const checkInput = document.getElementById("checkInput");
-const tempChecksDiv = document.getElementById("tempChecks");
+const checkPreview = document.getElementById("checkPreview");
 
-document.getElementById("btnNovo").onclick = () => {
-  editingId = null;
-  tempChecks = [];
-  titleInput.value = "";
-  tempChecksDiv.innerHTML="";
-  modalTitle.textContent="Criar tarefa";
+document.getElementById("btnNovo").onclick = () => openModal();
+document.getElementById("cancel").onclick = () => closeModal();
+document.getElementById("addCheck").onclick = () => addCheck();
+document.getElementById("save").onclick = () => saveTask();
+document.getElementById("btnExport").onclick = () => exportCSV();
+
+function openModal(task=null) {
+  editId = task ? task.id : null;
+  titleInput.value = task?.title || "";
+  descInput.value = task?.desc || "";
+  dateInput.value = task?.date || "";
+  priorityInput.value = task?.priority || "Média";
+  checklistTemp = task ? [...task.checklist] : [];
+  renderTempChecks();
   modal.classList.remove("hidden");
-};
+}
 
-document.getElementById("cancel").onclick = () => modal.classList.add("hidden");
+function closeModal() {
+  modal.classList.add("hidden");
+}
 
-document.getElementById("addCheck").onclick = () => {
-  if(!checkInput.value) return;
-  tempChecks.push({text:checkInput.value,done:false});
+function addCheck() {
+  if (!checkInput.value.trim()) return;
+  checklistTemp.push({ text: checkInput.value, done: false });
   checkInput.value="";
   renderTempChecks();
-};
+}
 
-function renderTempChecks(){
-  tempChecksDiv.innerHTML="";
-  tempChecks.forEach(c=>{
-    const d=document.createElement("div");
-    d.textContent="• "+c.text;
-    d.style.fontSize="12px";
-    tempChecksDiv.appendChild(d);
+function renderTempChecks() {
+  checkPreview.innerHTML="";
+  checklistTemp.forEach(i=>{
+    const div=document.createElement("div");
+    div.textContent="• "+i.text;
+    div.style.fontSize="13px";
+    checkPreview.appendChild(div);
   });
 }
 
-document.getElementById("save").onclick = () => {
-  if(!titleInput.value.trim()) return alert("Digite um título");
-  if(editingId){
-    const t = tasks.find(x=>x.id===editingId);
-    t.title=titleInput.value;
-    t.priority=priorityInput.value;
-    t.checks=[...tempChecks];
-  }else{
+function saveTask() {
+  if (!titleInput.value.trim()) return alert("Título é obrigatório");
+
+  const today = new Date().toISOString().split("T")[0];
+  if (dateInput.value && dateInput.value < today)
+    return alert("Data não pode ser no passado");
+
+  if (editId) {
+    const t = tasks.find(x=>x.id===editId);
+    Object.assign(t,{
+      title:titleInput.value,
+      desc:descInput.value,
+      date:dateInput.value,
+      priority:priorityInput.value,
+      checklist:checklistTemp
+    });
+  } else {
     tasks.push({
       id:Date.now(),
       title:titleInput.value,
+      desc:descInput.value,
+      date:dateInput.value,
       priority:priorityInput.value,
-      checks:[...tempChecks],
+      checklist:checklistTemp,
       status:"A Fazer"
     });
   }
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-  modal.classList.add("hidden");
-  render();
-};
+
+  persist();
+  closeModal();
+}
+
+function progress(t){
+  return t.checklist.length
+    ? Math.round(t.checklist.filter(c=>c.done).length/t.checklist.length*100)
+    : 0;
+}
 
 function render(){
   document.querySelectorAll(".card").forEach(c=>c.remove());
   tasks.forEach(t=>{
-    const col = document.querySelector(`[data-status="${t.status}"]`);
-    const done = t.checks.filter(c=>c.done).length;
-    const progress = t.checks.length?Math.round(done/t.checks.length*100):0;
-
+    const p=progress(t);
     const card=document.createElement("div");
-    card.className="card "+(progress===100?"green":progress>0?"yellow":"red");
-    card.draggable=true;
-    card.ondragstart=e=>e.dataTransfer.setData("id",t.id);
+    card.className="card "+(p===100?"green":p>0?"yellow":"red");
 
     card.innerHTML=`
       <div class="card-header">
@@ -277,23 +314,25 @@ function render(){
       </div>
       <div class="details">▶ Detalhes</div>
       <div class="detail-box hidden">
-        <div class="progress-text">${progress}%</div>
-        <div class="bar"><div style="width:${progress}%"></div></div>
+        <div>${p}%</div>
       </div>
     `;
 
-    const detailBox = card.querySelector(".detail-box");
-    card.querySelector(".details").onclick = ()=>detailBox.classList.toggle("hidden");
+    card.querySelector(".details").onclick=()=>{
+      card.querySelector(".detail-box").classList.toggle("hidden");
+    };
 
-    t.checks.forEach(c=>{
+    const box=card.querySelector(".detail-box");
+
+    t.checklist.forEach(c=>{
       const l=document.createElement("label");
       l.className="check";
       const cb=document.createElement("input");
       cb.type="checkbox";
       cb.checked=c.done;
-      cb.onchange=()=>{c.done=cb.checked;render()};
+      cb.onchange=()=>{c.done=cb.checked;persist()};
       l.append(cb,c.text);
-      detailBox.appendChild(l);
+      box.appendChild(l);
     });
 
     const act=document.createElement("div");
@@ -302,23 +341,12 @@ function render(){
       <button class="btn blue">Editar</button>
       <button class="btn red">Excluir</button>
     `;
-    act.children[0].onclick=()=>editTask(t.id);
-    act.children[1].onclick=()=>{if(confirm("Excluir?")){tasks=tasks.filter(x=>x.id!==t.id);localStorage.setItem("tasks",JSON.stringify(tasks));render()}};
-    detailBox.appendChild(act);
+    act.children[0].onclick=()=>openModal(t);
+    act.children[1].onclick=()=>{if(confirm("Excluir?")){tasks=tasks.filter(x=>x.id!==t.id);persist()}}
+    box.appendChild(act);
 
-    col.appendChild(card);
+    document.querySelector(`[data-status="${t.status}"]`).appendChild(card);
   });
-}
-
-function editTask(id){
-  const t = tasks.find(x=>x.id===id);
-  editingId=id;
-  titleInput.value=t.title;
-  priorityInput.value=t.priority;
-  tempChecks=[...t.checks];
-  renderTempChecks();
-  modalTitle.textContent="Editar tarefa";
-  modal.classList.remove("hidden");
 }
 
 document.querySelectorAll(".coluna").forEach(col=>{
@@ -327,25 +355,29 @@ document.querySelectorAll(".coluna").forEach(col=>{
     const id=e.dataTransfer.getData("id");
     const t=tasks.find(x=>x.id==id);
     t.status=col.dataset.status;
-    localStorage.setItem("tasks",JSON.stringify(tasks));
-    render();
+    persist();
   };
 });
 
-document.getElementById("btnExport").onclick=()=>{
+function persist(){
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  render();
+}
+
+function exportCSV(){
   let csv="Status;Título;Prioridade;Progresso\n";
   tasks.forEach(t=>{
-    const p=t.checks.length?Math.round(t.checks.filter(c=>c.done).length/t.checks.length*100):0;
-    csv+=`${t.status};"${t.title}";${t.priority};${p}%\n`;
+    csv+=`${t.status};"${t.title}";${t.priority};${progress(t)}%\n`;
   });
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([csv]));
   a.download="tarefas.csv";
   a.click();
-};
+}
 
 render();
 </script>
 
 </body>
 </html>
+``
