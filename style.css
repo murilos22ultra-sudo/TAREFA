@@ -83,6 +83,12 @@ h1 { margin: 0; }
   line-height: 1.4;
 }
 
+.progress-text {
+  font-size: 12px;
+  margin: 6px 0;
+  color: #e5e7eb;
+}
+
 /* BADGE */
 .badge {
   font-size: 12px;
