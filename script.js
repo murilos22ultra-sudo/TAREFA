@@ -1,12 +1,12 @@
 // ================================
-// ESTADO GLOBAL
+// ESTADO
 // ================================
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let checklistTemp = [];
 let editId = null;
 
 // ================================
-// ELEMENTOS DO MODAL
+// ELEMENTOS
 // ================================
 const modal = document.getElementById("modal");
 const titleInput = document.getElementById("taskTitle");
@@ -49,7 +49,7 @@ function closeModal() {
 }
 
 // ================================
-// CHECKLIST (MODAL)
+// CHECKLIST
 // ================================
 function addCheck() {
   if (!checkInput.value.trim()) return;
@@ -60,30 +60,34 @@ function addCheck() {
 
 function renderTempChecks() {
   checkPreview.innerHTML = "";
-  checklistTemp.forEach(item => {
+  checklistTemp.forEach(i => {
     const div = document.createElement("div");
-    div.textContent = "• " + item.text;
+    div.textContent = "• " + i.text;
     div.style.fontSize = "13px";
     checkPreview.appendChild(div);
   });
 }
 
 // ================================
-// SALVAR TAREFA
+// SALVAR
 // ================================
 function saveTask() {
   if (!titleInput.value.trim()) {
-    alert("Título é obrigatório");
+    alert("Título obrigatório");
     return;
   }
 
   if (editId) {
-    const t = tasks.find(x => x.id === editId);
-    t.title = titleInput.value;
-    t.desc = descInput.value;
-    t.date = dateInput.value;
-    t.priority = priorityInput.value;
-    t.checklist = [...checklistTemp];
+    Object.assign(
+      tasks.find(t => t.id === editId),
+      {
+        title: titleInput.value,
+        desc: descInput.value,
+        date: dateInput.value,
+        priority: priorityInput.value,
+        checklist: checklistTemp
+      }
+    );
   } else {
     tasks.push({
       id: Date.now(),
@@ -91,7 +95,7 @@ function saveTask() {
       desc: descInput.value,
       date: dateInput.value,
       priority: priorityInput.value,
-      checklist: [...checklistTemp],
+      checklist: checklistTemp,
       status: "A Fazer"
     });
   }
@@ -101,60 +105,38 @@ function saveTask() {
 }
 
 // ================================
-// PROGRESSO E PRAZO
+// UTIL
 // ================================
-function getProgress(task) {
+function progress(task) {
   if (!task.checklist.length) return 0;
-  return Math.round(
-    (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
-  );
+  return Math.round(task.checklist.filter(i => i.done).length / task.checklist.length * 100);
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const [y, m, d] = dateStr.split("-");
-  return `${d}/${m}/${y}`;
-}
-
-function prazoClass(dateStr) {
-  if (!dateStr) return "normal";
-
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  const prazo = new Date(dateStr);
-  prazo.setHours(0, 0, 0, 0);
-
-  const diff = (prazo - hoje) / (1000 * 60 * 60 * 24);
-
-  if (diff < 0) return "atrasado";
-  if (diff <= 1) return "proximo";
-  return "normal";
+function persist() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
 }
 
 // ================================
-// RENDERIZAÇÃO DOS CARDS
+// RENDER + DRAG
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
   tasks.forEach(task => {
-    const column = document.querySelector(
-      `[data-status="${task.status}"]`
-    );
-
-    const progress = getProgress(task);
-    const dateClass = prazoClass(task.date);
+    const col = document.querySelector(`[data-status="${task.status}"]`);
+    const p = progress(task);
 
     const card = document.createElement("div");
-    card.className =
-      "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
+    card.className = `card ${p === 100 ? "green" : p > 0 ? "yellow" : "red"}`;
 
-    card.setAttribute("draggable", "true");
+    /* ✅ DRAG FUNCIONAL */
+    card.draggable = true;
 
-    // ===== DRAG START / END =====
-    card.addEventListener("dragstart", () => {
+    card.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", task.id);
+      e.dataTransfer.effectAllowed = "move";
       card.classList.add("dragging");
-      card.dataset.id = task.id;
     });
 
     card.addEventListener("dragend", () => {
@@ -169,49 +151,38 @@ function render() {
 
       ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
 
-      ${task.date ? `
-        <div class="card-date ${dateClass}">
-          📅 Prazo: ${formatDate(task.date)}
-        </div>
-      ` : ""}
+      ${task.date ? `<div class="card-date normal">📅 ${task.date.split("-").reverse().join("/")}</div>` : ""}
 
       <div class="details">▶ Detalhes</div>
 
       <div class="detail-box hidden">
-        <div class="progress-text">${progress}%</div>
-        <div class="bar">
-          <div style="width:${progress}%"></div>
-        </div>
+        <div>${p}%</div>
+        <div class="bar"><div style="width:${p}%"></div></div>
       </div>
     `;
 
-    const detailBox = card.querySelector(".detail-box");
+    const box = card.querySelector(".detail-box");
 
-    // checklist nos detalhes
-    task.checklist.forEach(item => {
-      const label = document.createElement("label");
-      label.className = "check";
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = item.done;
-      checkbox.onchange = () => {
-        item.done = checkbox.checked;
+    task.checklist.forEach(c => {
+      const l = document.createElement("label");
+      l.className = "check";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = c.done;
+      cb.onchange = () => {
+        c.done = cb.checked;
         persist();
       };
-
-      label.append(checkbox, item.text);
-      detailBox.appendChild(label);
+      l.append(cb, c.text);
+      box.appendChild(l);
     });
 
-    // ações
     const actions = document.createElement("div");
     actions.className = "actions";
     actions.innerHTML = `
       <button class="btn blue">Editar</button>
       <button class="btn red">Excluir</button>
     `;
-
     actions.children[0].onclick = () => openModal(task);
     actions.children[1].onclick = () => {
       if (confirm("Excluir tarefa?")) {
@@ -220,60 +191,43 @@ function render() {
       }
     };
 
-    detailBox.appendChild(actions);
+    box.appendChild(actions);
 
     card.querySelector(".details").onclick = () => {
-      detailBox.classList.toggle("hidden");
+      box.classList.toggle("hidden");
     };
 
-    column.appendChild(card);
+    col.appendChild(card);
   });
 }
 
 // ================================
-// DRAG & DROP NAS COLUNAS
+// DROP NAS COLUNAS
 // ================================
-document.querySelectorAll(".coluna").forEach(coluna => {
-  coluna.addEventListener("dragover", e => {
+document.querySelectorAll(".coluna").forEach(col => {
+  col.addEventListener("dragover", e => {
     e.preventDefault();
-    coluna.classList.add("drag-over");
   });
 
-  coluna.addEventListener("dragleave", () => {
-    coluna.classList.remove("drag-over");
-  });
-
-  coluna.addEventListener("drop", e => {
+  col.addEventListener("drop", e => {
     e.preventDefault();
-    coluna.classList.remove("drag-over");
 
-    const draggedCard = document.querySelector(".card.dragging");
-    if (!draggedCard) return;
-
-    const taskId = draggedCard.dataset.id;
-    const task = tasks.find(t => t.id == taskId);
+    const id = e.dataTransfer.getData("text/plain");
+    const task = tasks.find(t => t.id == id);
     if (!task) return;
 
-    task.status = coluna.dataset.status;
+    task.status = col.dataset.status;
     persist();
   });
 });
 
 // ================================
-// PERSISTÊNCIA
-// ================================
-function persist() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
-}
-
-// ================================
-// EXPORTAR CSV
+// EXPORT CSV
 // ================================
 function exportCSV() {
-  let csv = "Status;Título;Descrição;Prazo;Prioridade;Progresso\n";
+  let csv = "Status;Título;Descrição\n";
   tasks.forEach(t => {
-    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.date || ""};${t.priority};${getProgress(t)}%\n`;
+    csv += `${t.status};"${t.title}";"${t.desc || ""}"\n`;
   });
 
   const a = document.createElement("a");
@@ -283,6 +237,6 @@ function exportCSV() {
 }
 
 // ================================
-// INICIALIZA
+// INIT
 // ================================
 render();
