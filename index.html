@@ -2,8 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Tarefas</title>
+  <title>TAREFAS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ CSS correto -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -45,18 +47,21 @@
 
     <div class="check-row">
       <input id="check-item" placeholder="Item do checklist">
-      <button onclick="addChecklist()">+</button>
+      <button type="button" onclick="addChecklist()">+</button>
     </div>
 
     <ul id="lista-checklist"></ul>
 
     <div class="modal-actions">
-      <button onclick="fecharModal()">Cancelar</button>
-      <button class="btn-primary" onclick="criarTarefa()">Adicionar tarefa</button>
+      <button type="button" onclick="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primary" onclick="criarTarefa()">
+        Adicionar tarefa
+      </button>
     </div>
   </div>
 </div>
 
+<!-- ✅ JS correto (no final do body) -->
 <script src="script.js"></script>
 </body>
 </html>
