@@ -1,123 +1,126 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f4f5f7;
-  color: #172b4d;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #0b1324, #05070f);
+  color: #e5e7eb;
+  min-height: 100vh;
 }
 
+/* ===== HEADER ===== */
 header {
-  padding: 16px;
-  background: #026aa7;
-  color: white;
-  text-align: center;
-}
-
-.new-task {
-  background: white;
-  padding: 16px;
-  border-bottom: 1px solid #dfe1e6;
-}
-
-.new-task input,
-.new-task select {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  border: 1px solid #dfe1e6;
-}
-
-.check-input {
   display: flex;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
 }
 
-.check-input button {
-  padding: 8px 12px;
+header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
 }
 
-.btn-primary {
-  background: #5aac44;
-  color: white;
+header button {
+  background: #2563eb;
+  color: #fff;
   border: none;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.kanban {
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  overflow-x: auto;
+header button:hover {
+  background: #1d4ed8;
 }
 
+/* ===== KANBAN ===== */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 24px 32px;
+}
+
+/* ===== COLUNAS ===== */
 .coluna {
-  background: #ebecf0;
-  padding: 8px;
-  border-radius: 6px;
-  min-width: 260px;
+  background: linear-gradient(180deg, #111827, #0b1324);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 220px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .coluna h2 {
-  font-size: 14px;
-  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #f9fafb;
 }
 
+/* ===== CARDS ===== */
 .card {
-  background: white;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-  border-left: 6px solid red;
+  background: linear-gradient(180deg, #1f2937, #111827);
+  border-radius: 12px;
+  padding: 14px 14px 18px;
+  margin-bottom: 12px;
   position: relative;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-left: 4px solid #facc15; /* default */
 }
 
-.card.red { border-left-color: #eb5a46; }
-.card.yellow { border-left-color: #f2d600; }
-.card.green { border-left-color: #61bd4f; }
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.6);
+}
 
+/* ===== BORDAS POR PROGRESSO ===== */
+.card.red    { border-left-color: #ef4444; }
+.card.yellow { border-left-color: #facc15; }
+.card.green  { border-left-color: #22c55e; }
+
+/* ===== TEXTO DO CARD ===== */
 .card strong {
   font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
 }
 
-.check {
+/* ===== DETALHES ===== */
+.card .detalhes {
   font-size: 13px;
+  color: #c7d2fe;
+  cursor: pointer;
 }
 
-.progress {
-  font-size: 12px;
-  margin-top: 6px;
+.card .detalhes:hover {
+  text-decoration: underline;
 }
 
-.progress-bar {
-  background: #dfe1e6;
-  height: 6px;
-  border-radius: 3px;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #61bd4f;
-  border-radius: 3px;
-}
-
+/* ===== BADGE PRIORIDADE ===== */
 .badge {
   position: absolute;
-  bottom: 6px;
-  right: 6px;
+  bottom: 8px;
+  right: 10px;
   font-size: 11px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 999px;
-  color: white;
+  font-weight: 500;
 }
 
-.badge.Alta { background: #eb5a46; }
-.badge.Média { background: #f2d600; color: #172b4d; }
-.badge.Baixa { background: #61bd4f; }
+.badge.Alta  { background: #ef4444; color: white; }
+.badge.Média { background: #facc15; color: #111827; }
+.badge.Baixa { background: #22c55e; color: #052e16; }
 
-footer {
-  padding: 16px;
-  text-align: center;
+/* ===== RESPONSIVO ===== */
+@media (max-width: 1000px) {
+  .kanban {
+    grid-template-columns: 1fr;
+  }
 }
