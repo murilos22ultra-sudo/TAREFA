@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let checklistTemp = [];
   let editId = null;
 
-  /* ELEMENTOS */
   const modal = document.getElementById("modal");
   const titleInput = document.getElementById("taskTitle");
   const descInput = document.getElementById("taskDesc");
@@ -13,14 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkInput = document.getElementById("checkInput");
   const checkPreview = document.getElementById("checkPreview");
 
-  /* BOTÕES */
-  document.getElementById("btnNovo").onclick   = () => openModal();
-  document.getElementById("cancel").onclick    = () => closeModal();
-  document.getElementById("addCheck").onclick  = () => addCheck();
-  document.getElementById("save").onclick      = () => saveTask();
+  document.getElementById("btnNovo").onclick = () => openModal();
+  document.getElementById("cancel").onclick = () => closeModal();
+  document.getElementById("addCheck").onclick = () => addCheck();
+  document.getElementById("save").onclick = () => saveTask();
   document.getElementById("btnExport").onclick = () => exportCSV();
 
-  /* MODAL */
   function openModal(task = null) {
     editId = task ? task.id : null;
     titleInput.value = task?.title || "";
@@ -38,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     checkPreview.innerHTML = "";
   }
 
-  /* CHECKLIST NO MODAL */
   function addCheck() {
     if (!checkInput.value.trim()) return;
     checklistTemp.push({ text: checkInput.value, done: false });
@@ -55,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* SALVAR TAREFA */
   function saveTask() {
     if (!titleInput.value.trim()) return alert("Título obrigatório");
 
@@ -78,17 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
         status: "A Fazer"
       });
     }
-
     persist();
     closeModal();
   }
 
-  /* UTIL */
-  function statusClass(status) {
-    if (status === "A Fazer") return "red";
-    if (status === "Em Progresso") return "yellow";
-    if (status === "Concluído") return "green";
-    return "red";
+  function statusClass(s) {
+    if (s === "A Fazer") return "red";
+    if (s === "Em Progresso") return "yellow";
+    return "green";
   }
 
   function progress(task) {
@@ -98,18 +90,16 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  function formatDate(dateStr) {
-    if (!dateStr) return "";
-    const [y,m,d] = dateStr.split("-");
-    return `${d}/${m}/${y}`;
+  function formatDate(d) {
+    if (!d) return "";
+    const [y, m, day] = d.split("-");
+    return `${day}/${m}/${y}`;
   }
 
-  /* RENDER */
   function render() {
     document.querySelectorAll(".card").forEach(c => c.remove());
-
-    document.querySelectorAll(".coluna").forEach(col => {
-      col.querySelector("h2").innerHTML = col.dataset.status;
+    document.querySelectorAll(".coluna").forEach(c => {
+      c.querySelector("h2").innerHTML = c.dataset.status;
     });
 
     tasks.forEach(task => {
@@ -126,27 +116,24 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
-        ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
+        ${task.date ? `<div class="card-date">📅 ${formatDate(task.date)}</div>` : ""}
 
-        ${task.checklist.length > 0 ? `
+        ${task.checklist.length ? `
           <div class="progress-wrapper">
             <div class="progress-bar">
               <div class="progress-fill" style="width:${p}%"></div>
             </div>
             <div class="progress-text">${p}% concluído</div>
-          </div>
-        ` : ""}
+          </div>` : ""}
 
         <div class="details">▶ Detalhes</div>
         <div class="detail-box hidden"></div>
       `;
 
-      /* DRAG */
       card.querySelector(".card-header").addEventListener("dragstart", e => {
         e.dataTransfer.setData("id", task.id);
       });
 
-      /* CHECKLIST NOS DETALHES */
       const box = card.querySelector(".detail-box");
       task.checklist.forEach(i => {
         const lbl = document.createElement("label");
@@ -159,25 +146,19 @@ document.addEventListener("DOMContentLoaded", () => {
         box.appendChild(lbl);
       });
 
-      /* AÇÕES */
       const actions = document.createElement("div");
       actions.className = "actions";
       actions.innerHTML = `
         <button class="btn blue">Editar</button>
-        <button class="btn red">Excluir</button>
-      `;
+        <button class="btn red">Excluir</button>`;
       actions.children[0].onclick = () => openModal(task);
       actions.children[1].onclick = () => {
-        if (confirm("Excluir tarefa?")) {
-          tasks = tasks.filter(t => t.id !== task.id);
-          persist();
-        }
+        tasks = tasks.filter(t => t.id !== task.id);
+        persist();
       };
       box.appendChild(actions);
 
-      card.querySelector(".details").onclick = () =>
-        box.classList.toggle("hidden");
-
+      card.querySelector(".details").onclick = () => box.classList.toggle("hidden");
       col.appendChild(card);
     });
 
@@ -188,7 +169,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* DRAG & DROP */
+  function persist() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    render();
+  }
+
+  function exportCSV() {
+    let csv = "Status;Título;Descrição;Prazo;Prioridade;Checklist;Progresso\n";
+    tasks.forEach(task => {
+      const checklistText = task.checklist
+        .map(i => (i.done ? "☑ " : "☐ ") + i.text)
+        .join(" | ");
+      csv += `${task.status};"${task.title}";"${task.desc || ""}";"${formatDate(task.date)}";${task.priority};"${checklistText}";${progress(task)}%\n`;
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv]));
+    a.download = "tarefas_kanban.csv";
+    a.click();
+  }
+
   document.querySelectorAll(".coluna").forEach(col => {
     col.ondragover = e => e.preventDefault();
     col.ondrop = e => {
@@ -198,34 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
       persist();
     };
   });
-
-  /* PERSISTÊNCIA */
-  function persist() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    render();
-  }
-
-  /* EXPORT CSV */
-  function exportCSV() {
-    let csv = "Status;Título;Descrição;Prazo;Prioridade;Checklist;Progresso\n";
-
-    tasks.forEach(task => {
-      const p = progress(task);
-      const prazo = task.date ? formatDate(task.date) : "";
-      const checklistText = task.checklist
-        .map(i => (i.done ? "☑ " : "☐ ") + i.text)
-        .join(" | ");
-
-      csv +=
-        `${task.status};"${task.title}";"${task.desc || ""}";"${prazo}";` +
-        `${task.priority};"${checklistText}";${p}%\n`;
-    });
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv]));
-    a.download = "tarefas_kanban.csv";
-    a.click();
-  }
 
   render();
 });
