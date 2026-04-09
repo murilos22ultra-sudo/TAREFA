@@ -1,144 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>TAREFAS</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Kanban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  margin:0;
-  font-family:system-ui,Arial;
-  background:radial-gradient(circle at top,#0b1324,#05070f);
-  color:#e5e7eb;
-}
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px 32px;
-}
-.btn{
-  background:#2563eb;
-  color:white;
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-  cursor:pointer;
-}
-.kanban{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:24px;
-  padding:24px 32px;
-}
-.coluna{
-  background:#111827;
-  border-radius:16px;
-  padding:16px;
-  min-height:300px;
-}
-.card{
-  background:#1f2937;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:14px;
-  border-left:4px solid red;
-  position:relative;
-}
-.card.red{border-left-color:#ef4444}
-.card.yellow{border-left-color:#facc15}
-.card.green{border-left-color:#22c55e}
-.check{
-  display:flex;
-  gap:6px;
-  font-size:13px;
-}
-.bar{
-  background:#374151;
-  height:6px;
-  border-radius:4px;
-}
-.bar div{
-  height:100%;
-  background:#22c55e;
-}
-.badge{
-  position:absolute;
-  bottom:6px;
-  right:8px;
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:999px;
-}
-.badge.Alta{background:#ef4444}
-.badge.Média{background:#facc15;color:#111827}
-.badge.Baixa{background:#22c55e}
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.hidden{display:none}
-.box{
-  background:#020617;
-  padding:20px;
-  border-radius:12px;
-  width:320px;
-}
-.box input,.box select{
-  width:100%;
-  padding:8px;
-  margin-bottom:8px;
-  border-radius:6px;
-  border:none;
-}
-.row{display:flex;gap:6px}
-.actions{display:flex;gap:6px;margin-top:6px}
-</style>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    header {
+      padding: 16px 24px;
+      background: #020617;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .kanban {
+      display: flex;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .coluna {
+      background: #111827;
+      padding: 16px;
+      border-radius: 8px;
+      width: 33%;
+      min-height: 200px;
+    }
+
+    .card {
+      background: #1f2937;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .modal-box {
+      background: #020617;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+    }
+
+    .modal-box input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: none;
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
   <h1>TAREFAS</h1>
-  <div>
-    <button id="btnCriar" class="btn">+ Criar tarefa</button>
-    <button id="btnExportar" class="btn">Exportar CSV</button>
-  </div>
+  <button id="btnAbrir">+ Criar tarefa</button>
 </header>
 
-<main class="kanban">
-  <div class="coluna" data-status="A Fazer"><h3>A Fazer</h3></div>
-  <div class="coluna" data-status="Em Progresso"><h3>Em Progresso</h3></div>
-  <div class="coluna" data-status="Concluído"><h3>Concluído</h3></div>
-</main>
+<div class="kanban">
+  <div class="coluna" id="colA">
+    <h3>A Fazer</h3>
+  </div>
+  <div class="coluna">
+    <h3>Em Progresso</h3>
+  </div>
+  <div class="coluna">
+    <h3>Concluído</h3>
+  </div>
+</div>
 
+<!-- MODAL -->
 <div id="modal" class="modal hidden">
-  <div class="box">
-    <h3 id="tituloModal">Criar tarefa</h3>
+  <div class="modal-box">
+    <h3>Criar tarefa</h3>
 
-    <input id="inputTitulo" placeholder="Título">
+    <input id="inputTitulo" placeholder="Título da tarefa">
 
-    <select id="selectPrioridade">
-      <option>Média</option>
-      <option>Alta</option>
-      <option>Baixa</option>
-    </select>
-
-    <div class="row">
-      <input id="inputChecklist" placeholder="Checklist">
-      <button id="btnAddChecklist" type="button">+</button>
-    </div>
-
-    <ul id="listaChecklist"></ul>
-
-    <div class="row">
-      <button id="btnCancelar" type="button">Cancelar</button>
-      <button id="btnSalvar" type="button" class="btn">Salvar</button>
+    <div style="display:flex; gap:8px;">
+      <button id="btnCancelar" style="background:#374151;">Cancelar</button>
+      <button id="btnSalvar">Salvar</button>
     </div>
   </div>
 </div>
@@ -146,131 +117,38 @@ header{
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const btnCriar = document.getElementById("btnCriar");
-  const btnSalvar = document.getElementById("btnSalvar");
+  const btnAbrir = document.getElementById("btnAbrir");
   const btnCancelar = document.getElementById("btnCancelar");
-  const btnAddChecklist = document.getElementById("btnAddChecklist");
-  const btnExportar = document.getElementById("btnExportar");
-
+  const btnSalvar = document.getElementById("btnSalvar");
   const modal = document.getElementById("modal");
   const inputTitulo = document.getElementById("inputTitulo");
-  const selectPrioridade = document.getElementById("selectPrioridade");
-  const inputChecklist = document.getElementById("inputChecklist");
-  const listaChecklist = document.getElementById("listaChecklist");
+  const colA = document.getElementById("colA");
 
-  let listaTarefas = JSON.parse(localStorage.getItem("listaTarefas")) || [];
-  let checklistTemp = [];
-  let editId = null;
-
-  btnCriar.onclick = () => {
-    editId = null;
-    checklistTemp = [];
+  btnAbrir.addEventListener("click", () => {
     inputTitulo.value = "";
-    listaChecklist.innerHTML = "";
     modal.classList.remove("hidden");
-  };
+  });
 
-  btnCancelar.onclick = () => modal.classList.add("hidden");
+  btnCancelar.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
 
-  btnAddChecklist.onclick = () => {
-    if (!inputChecklist.value.trim()) return;
-    checklistTemp.push({ texto: inputChecklist.value, ok:false });
-    inputChecklist.value = "";
-    renderChecklistTemp();
-  };
+  btnSalvar.addEventListener("click", () => {
+    const titulo = inputTitulo.value.trim();
 
-  btnSalvar.onclick = () => {
-    if (!inputTitulo.value.trim()) {
+    if (!titulo) {
       alert("Digite um título");
       return;
     }
 
-    if (editId) {
-      const t = listaTarefas.find(x => x.id === editId);
-      t.titulo = inputTitulo.value;
-      t.prioridade = selectPrioridade.value;
-      t.checklist = [...checklistTemp];
-    } else {
-      listaTarefas.push({
-        id: Date.now(),
-        titulo: inputTitulo.value,
-        prioridade: selectPrioridade.value,
-        checklist: [...checklistTemp],
-        status: "A Fazer"
-      });
-    }
+    const card = document.createElement("div");
+    card.className = "card";
+    card.textContent = titulo;
 
-    salvar();
+    colA.appendChild(card);
     modal.classList.add("hidden");
-  };
+  });
 
-  function renderChecklistTemp(){
-    listaChecklist.innerHTML = "";
-    checklistTemp.forEach(i => {
-      const li = document.createElement("li");
-      li.textContent = i.texto;
-      listaChecklist.appendChild(li);
-    });
-  }
-
-  function progresso(list){
-    if (!list.length) return 0;
-    return Math.round(list.filter(i=>i.ok).length / list.length * 100);
-  }
-
-  function salvar(){
-    localStorage.setItem("listaTarefas", JSON.stringify(listaTarefas));
-    render();
-  }
-
-  function render(){
-    document.querySelectorAll(".card").forEach(c=>c.remove());
-
-    listaTarefas.forEach(t => {
-      const p = progresso(t.checklist);
-      const card = document.createElement("div");
-      card.className = "card " + (p===100?"green":p>0?"yellow":"red");
-
-      card.innerHTML = `
-        <strong>${t.titulo}</strong>
-        <div>Progresso: ${p}%</div>
-        <div class="bar"><div style="width:${p}%"></div></div>
-      `;
-
-      t.checklist.forEach(i => {
-        const l = document.createElement("label");
-        l.className = "check";
-        const b = document.createElement("input");
-        b.type = "checkbox";
-        b.checked = i.ok;
-        b.onchange = () => { i.ok = b.checked; salvar(); };
-        l.append(b," "+i.texto);
-        card.appendChild(l);
-      });
-
-      const badge = document.createElement("span");
-      badge.className = "badge " + t.prioridade;
-      badge.textContent = t.prioridade;
-      card.appendChild(badge);
-
-      document
-        .querySelector(`[data-status="${t.status}"]`)
-        .appendChild(card);
-    });
-  }
-
-  btnExportar.onclick = () => {
-    let csv = "Status;Título;Prioridade;Progresso\n";
-    listaTarefas.forEach(t=>{
-      csv += `${t.status};"${t.titulo}";${t.prioridade};${progresso(t.checklist)}%\n`;
-    });
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob([csv]));
-    a.download="tarefas.csv";
-    a.click();
-  };
-
-  render();
 });
 </script>
 
