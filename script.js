@@ -1,79 +1,156 @@
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let checklistTemp = [];
-let tarefas = JSON.parse(localStorage.getItem("tarefas")) || [];
+let editId = null;
 
-/* MODAL */
-function abrirModal() {
-  document.getElementById("modal").classList.remove("hidden");
+const modal = document.getElementById("modal");
+const titleInput = document.getElementById("taskTitle");
+const descInput = document.getElementById("taskDesc");
+const dateInput = document.getElementById("taskDate");
+const priorityInput = document.getElementById("taskPriority");
+const checkInput = document.getElementById("checkInput");
+const checkPreview = document.getElementById("checkPreview");
+
+document.getElementById("btnNovo").onclick = () => openModal();
+document.getElementById("cancel").onclick = () => closeModal();
+document.getElementById("addCheck").onclick = () => addCheck();
+document.getElementById("save").onclick = () => saveTask();
+document.getElementById("btnExport").onclick = () => exportCSV();
+
+function openModal(task = null) {
+  editId = task ? task.id : null;
+  titleInput.value = task?.title || "";
+  descInput.value = task?.desc || "";
+  dateInput.value = task?.date || "";
+  priorityInput.value = task?.priority || "Média";
+  checklistTemp = task ? [...task.checklist] : [];
+  renderTempChecks();
+  modal.classList.remove("hidden");
 }
 
-function fecharModal() {
-  document.getElementById("modal").classList.add("hidden");
+function closeModal() {
+  modal.classList.add("hidden");
 }
 
-/* CHECKLIST */
-function addChecklist() {
-  const input = document.getElementById("check-item");
-  const texto = input.value.trim();
-  if (!texto) return;
-
-  checklistTemp.push({ texto, ok: false });
-  input.value = "";
-  renderChecklistTemp();
+function addCheck() {
+  if (!checkInput.value.trim()) return;
+  checklistTemp.push({ text: checkInput.value, done: false });
+  checkInput.value = "";
+  renderTempChecks();
 }
 
-function renderChecklistTemp() {
-  const ul = document.getElementById("lista-checklist");
-  ul.innerHTML = "";
-  checklistTemp.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item.texto;
-    ul.appendChild(li);
+function renderTempChecks() {
+  checkPreview.innerHTML = "";
+  checklistTemp.forEach(i => {
+    const div = document.createElement("div");
+    div.textContent = "• " + i.text;
+    checkPreview.appendChild(div);
   });
 }
 
-/* CRIAR TAREFA */
-function criarTarefa() {
-  const titulo = document.getElementById("titulo").value.trim();
-  const prioridade = document.getElementById("prioridade").value;
+function saveTask() {
+  if (!titleInput.value.trim()) return alert("Título é obrigatório");
 
-  if (!titulo) {
-    alert("Digite um título");
-    return;
+  if (editId) {
+    const t = tasks.find(x => x.id === editId);
+    Object.assign(t, {
+      title: titleInput.value,
+      desc: descInput.value,
+      date: dateInput.value,
+      priority: priorityInput.value,
+      checklist: checklistTemp
+    });
+  } else {
+    tasks.push({
+      id: Date.now(),
+      title: titleInput.value,
+      desc: descInput.value,
+      date: dateInput.value,
+      priority: priorityInput.value,
+      checklist: checklistTemp,
+      status: "A Fazer"
+    });
   }
 
-  tarefas.push({
-    titulo,
-    prioridade,
-    checklist: [...checklistTemp],
-    status: "A Fazer"
-  });
-
-  checklistTemp = [];
-  document.getElementById("titulo").value = "";
-  renderChecklistTemp();
-
-  salvar();
-  fecharModal();
+  persist();
+  closeModal();
 }
 
-/* RENDER */
-function salvar() {
-  localStorage.setItem("tarefas", JSON.stringify(tarefas));
-  render();
+function progress(t) {
+  return t.checklist.length
+    ? Math.round(t.checklist.filter(c => c.done).length / t.checklist.length * 100)
+    : 0;
 }
 
 function render() {
-  document.querySelectorAll(".cards").forEach(c => c.innerHTML = "");
+  document.querySelectorAll(".card").forEach(c => c.remove());
 
-  tarefas.forEach(t => {
+  tasks.forEach(t => {
+    const p = progress(t);
+    const col = document.querySelector(`[data-status="${t.status}"]`);
+
     const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<strong>${t.titulo}</strong>`;
+    card.className = "card " + (p === 100 ? "green" : p > 0 ? "yellow" : "red");
 
-    document
-      .querySelector(`[data-status="${t.status}"] .cards`)
-      .appendChild(card);
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-title">${t.title}</span>
+        <span class="badge ${t.priority}">${t.priority}</span>
+      </div>
+      <div class="card-desc">${t.desc || ""}</div>
+      <div class="details">▶ Detalhes</div>
+      <div class="detail-box hidden"></div>
+    `;
+
+    const box = card.querySelector(".detail-box");
+
+    t.checklist.forEach(c => {
+      const l = document.createElement("label");
+      l.className = "check";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = c.done;
+      cb.onchange = () => { c.done = cb.checked; persist(); };
+      l.append(cb, c.text);
+      box.appendChild(l);
+    });
+
+    const actions = document.createElement("div");
+    actions.innerHTML = `
+      <button class="btn blue">Editar</button>
+      <button class="btn red">Excluir</button>
+    `;
+    actions.children[0].onclick = () => openModal(t);
+    actions.children[1].onclick = () => {
+      if (confirm("Excluir tarefa?")) {
+        tasks = tasks.filter(x => x.id !== t.id);
+        persist();
+      }
+    };
+
+    box.appendChild(actions);
+
+    card.querySelector(".details").onclick = () =>
+      box.classList.toggle("hidden");
+
+    col.appendChild(card);
   });
+}
+
+function persist() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
+}
+
+function exportCSV() {
+  let csv = "Status;Título;Descrição;Prioridade\n";
+  tasks.forEach(t => {
+    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.priority}\n`;
+  });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv]));
+  a.download = "tarefas.csv";
+  a.click();
 }
 
 render();
