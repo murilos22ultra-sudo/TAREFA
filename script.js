@@ -118,24 +118,27 @@ function render() {
     card.className = "card " + statusClass(task.status);
 
     card.innerHTML = `
-      <div class="card-header" draggable="true">
-        <span class="card-title">${task.title}</span>
-        <span class="badge ${task.priority}">${task.priority}</span>
+  <div class="card-header" draggable="true">
+    <span class="card-title">${task.title}</span>
+    <span class="badge ${task.priority}">${task.priority}</span>
+  </div>
+
+  ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
+
+  ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
+
+  ${task.checklist.length > 0 ? `
+    <div class="progress-wrapper">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${p}%"></div>
       </div>
+      <div class="progress-text">${p}% concluído</div>
+    </div>
+  ` : ""}
 
-      ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
-
-      ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
-
-      <div class="progress-wrapper">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width:${p}%"></div>
-        </div>
-        <div class="progress-text">${p}% concluído</div>
-      </div>
-
-      <div class="details">▶ Detalhes</div>
-      <div class="detail-box hidden"></div>
+  <div class="details">▶ Detalhes</div>
+  <div class="detail-box hidden"></div>
+`;
     `;
 
     // DRAG
