@@ -140,14 +140,65 @@ function render() {
       ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
 
       <div class="details">▶ Detalhes</div>
-
-      <div class="detail-box hidden">
-        <div class="actions">
-          <button class="btn blue">Editar</button>
-          <button class="btn red">Excluir</button>
-        </div>
-      </div>
+      <div class="detail-box hidden"></div>
     `;
+
+    /* ===== DRAG PELO HEADER ===== */
+    const header = card.querySelector(".card-header");
+    header.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", task.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    const detailBox = card.querySelector(".detail-box");
+
+    /* ===== ✅ CHECKLIST (ESTAVA FALTANDO!) ===== */
+    if (task.checklist && task.checklist.length) {
+      task.checklist.forEach(item => {
+        const label = document.createElement("label");
+        label.className = "check";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = item.done;
+
+        checkbox.onchange = () => {
+          item.done = checkbox.checked;
+          persist();
+        };
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" " + item.text));
+        detailBox.appendChild(label);
+      });
+    }
+
+    /* ===== AÇÕES ===== */
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.innerHTML = `
+      <button class="btn blue">Editar</button>
+      <button class="btn red">Excluir</button>
+    `;
+
+    actions.children[0].onclick = () => openModal(task);
+    actions.children[1].onclick = () => {
+      if (confirm("Excluir tarefa?")) {
+        tasks = tasks.filter(t => t.id !== task.id);
+        persist();
+      }
+    };
+
+    detailBox.appendChild(actions);
+
+    /* ===== TOGGLE DETALHES ===== */
+    card.querySelector(".details").onclick = () => {
+      detailBox.classList.toggle("hidden");
+    };
+
+    col.appendChild(card);
+  });
+}
 
     // DRAG
     const header = card.querySelector(".card-header");
