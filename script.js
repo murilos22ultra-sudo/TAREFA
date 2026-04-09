@@ -1,7 +1,13 @@
+// ================================
+// ESTADO GLOBAL
+// ================================
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let checklistTemp = [];
 let editId = null;
 
+// ================================
+// ELEMENTOS DO MODAL
+// ================================
 const modal = document.getElementById("modal");
 const titleInput = document.getElementById("taskTitle");
 const descInput = document.getElementById("taskDesc");
@@ -10,55 +16,85 @@ const priorityInput = document.getElementById("taskPriority");
 const checkInput = document.getElementById("checkInput");
 const checkPreview = document.getElementById("checkPreview");
 
+// ================================
+// BOTÕES
+// ================================
 document.getElementById("btnNovo").onclick = () => openModal();
 document.getElementById("cancel").onclick = () => closeModal();
 document.getElementById("addCheck").onclick = () => addCheck();
 document.getElementById("save").onclick = () => saveTask();
 document.getElementById("btnExport").onclick = () => exportCSV();
 
+// ================================
+// MODAL
+// ================================
 function openModal(task = null) {
   editId = task ? task.id : null;
+
   titleInput.value = task?.title || "";
   descInput.value = task?.desc || "";
   dateInput.value = task?.date || "";
   priorityInput.value = task?.priority || "Média";
+
   checklistTemp = task ? [...task.checklist] : [];
   renderTempChecks();
+
   modal.classList.remove("hidden");
 }
 
 function closeModal() {
   modal.classList.add("hidden");
+  checklistTemp = [];
+  checkPreview.innerHTML = "";
 }
 
+// ================================
+// CHECKLIST (MODAL)
+// ================================
 function addCheck() {
   if (!checkInput.value.trim()) return;
-  checklistTemp.push({ text: checkInput.value, done: false });
+
+  checklistTemp.push({
+    text: checkInput.value,
+    done: false
+  });
+
   checkInput.value = "";
   renderTempChecks();
 }
 
 function renderTempChecks() {
   checkPreview.innerHTML = "";
-  checklistTemp.forEach(i => {
+  checklistTemp.forEach(item => {
     const div = document.createElement("div");
-    div.textContent = "• " + i.text;
+    div.textContent = "• " + item.text;
+    div.style.fontSize = "13px";
     checkPreview.appendChild(div);
   });
 }
 
+// ================================
+// SALVAR TAREFA
+// ================================
 function saveTask() {
-  if (!titleInput.value.trim()) return alert("Título é obrigatório");
+  if (!titleInput.value.trim()) {
+    alert("Título é obrigatório");
+    return;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  if (dateInput.value && dateInput.value < today) {
+    alert("A data não pode ser no passado");
+    return;
+  }
 
   if (editId) {
     const t = tasks.find(x => x.id === editId);
-    Object.assign(t, {
-      title: titleInput.value,
-      desc: descInput.value,
-      date: dateInput.value,
-      priority: priorityInput.value,
-      checklist: checklistTemp
-    });
+    t.title = titleInput.value;
+    t.desc = descInput.value;
+    t.date = dateInput.value;
+    t.priority = priorityInput.value;
+    t.checklist = checklistTemp;
   } else {
     tasks.push({
       id: Date.now(),
@@ -75,76 +111,132 @@ function saveTask() {
   closeModal();
 }
 
-function progress(t) {
-  return t.checklist.length
-    ? Math.round(t.checklist.filter(c => c.done).length / t.checklist.length * 100)
-    : 0;
+// ================================
+// PROGRESSO
+// ================================
+function getProgress(task) {
+  if (!task.checklist.length) return 0;
+  return Math.round(
+    (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
+  );
 }
 
+// ================================
+// RENDERIZAÇÃO DOS CARDS
+// ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
-  tasks.forEach(t => {
-    const p = progress(t);
-    const col = document.querySelector(`[data-status="${t.status}"]`);
+  tasks.forEach(task => {
+    const column = document.querySelector(
+      `[data-status="${task.status}"]`
+    );
+
+    const progress = getProgress(task);
 
     const card = document.createElement("div");
-    card.className = "card " + (p === 100 ? "green" : p > 0 ? "yellow" : "red");
+    card.className =
+      "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
 
+    // ✅ DESCRIÇÃO INSERIDA AQUI
     card.innerHTML = `
       <div class="card-header">
-        <span class="card-title">${t.title}</span>
-        <span class="badge ${t.priority}">${t.priority}</span>
+        <span class="card-title">${task.title}</span>
+        <span class="badge ${task.priority}">${task.priority}</span>
       </div>
-      <div class="card-desc">${t.desc || ""}</div>
+
+      ${
+        task.desc
+          ? `<div class="card-desc">${task.desc}</div>`
+          : ""
+      }
+
       <div class="details">▶ Detalhes</div>
-      <div class="detail-box hidden"></div>
+
+      <div class="detail-box hidden">
+        <div class="progress-text">${progress}%</div>
+        <div class="bar">
+          <div style="width:${progress}%"></div>
+        </div>
+      </div>
     `;
 
-    const box = card.querySelector(".detail-box");
+    const detailBox = card.querySelector(".detail-box");
 
-    t.checklist.forEach(c => {
-      const l = document.createElement("label");
-      l.className = "check";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = c.done;
-      cb.onchange = () => { c.done = cb.checked; persist(); };
-      l.append(cb, c.text);
-      box.appendChild(l);
+    // Checklist dentro dos detalhes
+    task.checklist.forEach(item => {
+      const label = document.createElement("label");
+      label.className = "check";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = item.done;
+      checkbox.onchange = () => {
+        item.done = checkbox.checked;
+        persist();
+      };
+
+      label.append(checkbox, item.text);
+      detailBox.appendChild(label);
     });
 
+    // Ações
     const actions = document.createElement("div");
+    actions.className = "actions";
     actions.innerHTML = `
       <button class="btn blue">Editar</button>
       <button class="btn red">Excluir</button>
     `;
-    actions.children[0].onclick = () => openModal(t);
+
+    actions.children[0].onclick = () => openModal(task);
     actions.children[1].onclick = () => {
-      if (confirm("Excluir tarefa?")) {
-        tasks = tasks.filter(x => x.id !== t.id);
+      if (confirm("Deseja excluir esta tarefa?")) {
+        tasks = tasks.filter(t => t.id !== task.id);
         persist();
       }
     };
 
-    box.appendChild(actions);
+    detailBox.appendChild(actions);
 
-    card.querySelector(".details").onclick = () =>
-      box.classList.toggle("hidden");
+    // Toggle detalhes
+    card.querySelector(".details").onclick = () => {
+      detailBox.classList.toggle("hidden");
+    };
 
-    col.appendChild(card);
+    column.appendChild(card);
   });
 }
 
+// ================================
+// DRAG & DROP
+// ================================
+document.querySelectorAll(".coluna").forEach(col => {
+  col.ondragover = e => e.preventDefault();
+  col.ondrop = e => {
+    const id = e.dataTransfer.getData("id");
+    const t = tasks.find(x => x.id == id);
+    t.status = col.dataset.status;
+    persist();
+  };
+});
+
+// ================================
+// PERSISTÊNCIA
+// ================================
 function persist() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
   render();
 }
 
+// ================================
+// EXPORTAR CSV
+// ================================
 function exportCSV() {
-  let csv = "Status;Título;Descrição;Prioridade\n";
+  let csv = "Status;Título;Descrição;Prioridade;Progresso\n";
+
   tasks.forEach(t => {
-    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.priority}\n`;
+    const p = getProgress(t);
+    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.priority};${p}%\n`;
   });
 
   const a = document.createElement("a");
@@ -153,4 +245,7 @@ function exportCSV() {
   a.click();
 }
 
+// ================================
+// INICIALIZA
+// ================================
 render();
