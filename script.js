@@ -1,6 +1,7 @@
 let checklistTemp = [];
 let tarefas = JSON.parse(localStorage.getItem("tarefas")) || [];
 
+/* MODAL */
 function abrirModal() {
   document.getElementById("modal").classList.remove("hidden");
 }
@@ -9,11 +10,13 @@ function fecharModal() {
   document.getElementById("modal").classList.add("hidden");
 }
 
+/* CHECKLIST */
 function addChecklist() {
   const input = document.getElementById("check-item");
-  if (!input.value.trim()) return;
+  const texto = input.value.trim();
+  if (!texto) return;
 
-  checklistTemp.push({ texto: input.value, ok: false });
+  checklistTemp.push({ texto, ok: false });
   input.value = "";
   renderChecklistTemp();
 }
@@ -28,6 +31,7 @@ function renderChecklistTemp() {
   });
 }
 
+/* CRIAR TAREFA */
 function criarTarefa() {
   const titulo = document.getElementById("titulo").value.trim();
   const prioridade = document.getElementById("prioridade").value;
@@ -40,17 +44,19 @@ function criarTarefa() {
   tarefas.push({
     titulo,
     prioridade,
-    checklist: checklistTemp,
+    checklist: [...checklistTemp],
     status: "A Fazer"
   });
 
   checklistTemp = [];
   document.getElementById("titulo").value = "";
   renderChecklistTemp();
+
   salvar();
   fecharModal();
 }
 
+/* RENDER */
 function salvar() {
   localStorage.setItem("tarefas", JSON.stringify(tarefas));
   render();
@@ -71,4 +77,3 @@ function render() {
 }
 
 render();
-``
