@@ -1,172 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>TAREFAS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: system-ui, Segoe UI, Arial;
-  background: radial-gradient(circle at top, #0b1324, #05070f);
-  color: #e5e7eb;
-}
-
-/* HEADER */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 40px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 28px;
-}
-
-/* BOTÕES */
-.btn {
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn.blue { background: #2563eb; color: #fff; }
-.btn.green { background: #16a34a; color: #fff; }
-.btn.gray { background: #334155; color: #e5e7eb; }
-.btn.red { background: #dc2626; color: #fff; }
-
-.header-actions { display: flex; gap: 12px; }
-
-/* KANBAN */
-.kanban {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 32px;
-  padding: 0 40px 40px;
-}
-
-.coluna {
-  background: linear-gradient(180deg,#0f172a,#020617);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-}
-
-.coluna h2 {
-  margin-top: 0;
-  font-size: 16px;
-}
-
-/* CARD */
-.card {
-  background: linear-gradient(180deg,#1f2937,#111827);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  border-left: 4px solid #facc15;
-}
-
-.card.red { border-left-color:#ef4444; }
-.card.yellow { border-left-color:#facc15; }
-.card.green { border-left-color:#22c55e; }
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.card-title { font-weight: 600; font-size: 14px; }
-
-.badge {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.badge.Alta { background:#dc2626; }
-.badge.Média { background:#facc15; color:#111827; }
-.badge.Baixa { background:#22c55e; }
-
-.details {
-  font-size: 12px;
-  color: #c7d2fe;
-  cursor: pointer;
-  margin-top: 6px;
-}
-
-.detail-box.hidden { display: none; }
-
-.check {
-  font-size: 12px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hidden { display: none; }
-
-.modal-box {
-  background:#020617;
-  border-radius:14px;
-  padding:24px;
-  width:420px;
-}
-
-.modal-box input,
-.modal-box textarea,
-.modal-box select {
-  width: 100%;
-  background:#1e293b;
-  border:none;
-  border-radius:8px;
-  padding:12px;
-  color:#e5e7eb;
-  margin-bottom:12px;
-}
-
-.modal-box textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.check-row {
-  display: flex;
-  gap: 10px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>TAREFAS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
 <header>
@@ -188,17 +27,18 @@ header h1 {
   <div class="modal-box">
     <h3 id="modalTitle">Cadastrar atividade</h3>
 
-    <input id="taskTitle" placeholder="Título">
+    <input id="taskTitle" placeholder="Título" />
     <textarea id="taskDesc" placeholder="Descrição"></textarea>
-    <input id="taskDate" type="date">
+    <input id="taskDate" type="date" />
+    
     <select id="taskPriority">
-      <option>Média</option>
       <option>Alta</option>
+      <option selected>Média</option>
       <option>Baixa</option>
     </select>
 
     <div class="check-row">
-      <input id="checkInput" placeholder="Item do checklist">
+      <input id="checkInput" placeholder="Item do checklist" />
       <button class="btn gray" id="addCheck">Adicionar</button>
     </div>
 
@@ -211,173 +51,6 @@ header h1 {
   </div>
 </div>
 
-<script>
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let checklistTemp = [];
-let editId = null;
-
-const modal = document.getElementById("modal");
-const titleInput = document.getElementById("taskTitle");
-const descInput = document.getElementById("taskDesc");
-const dateInput = document.getElementById("taskDate");
-const priorityInput = document.getElementById("taskPriority");
-const checkInput = document.getElementById("checkInput");
-const checkPreview = document.getElementById("checkPreview");
-
-document.getElementById("btnNovo").onclick = () => openModal();
-document.getElementById("cancel").onclick = () => closeModal();
-document.getElementById("addCheck").onclick = () => addCheck();
-document.getElementById("save").onclick = () => saveTask();
-document.getElementById("btnExport").onclick = () => exportCSV();
-
-function openModal(task=null) {
-  editId = task ? task.id : null;
-  titleInput.value = task?.title || "";
-  descInput.value = task?.desc || "";
-  dateInput.value = task?.date || "";
-  priorityInput.value = task?.priority || "Média";
-  checklistTemp = task ? [...task.checklist] : [];
-  renderTempChecks();
-  modal.classList.remove("hidden");
-}
-
-function closeModal() {
-  modal.classList.add("hidden");
-}
-
-function addCheck() {
-  if (!checkInput.value.trim()) return;
-  checklistTemp.push({ text: checkInput.value, done: false });
-  checkInput.value="";
-  renderTempChecks();
-}
-
-function renderTempChecks() {
-  checkPreview.innerHTML="";
-  checklistTemp.forEach(i=>{
-    const div=document.createElement("div");
-    div.textContent="• "+i.text;
-    div.style.fontSize="13px";
-    checkPreview.appendChild(div);
-  });
-}
-
-function saveTask() {
-  if (!titleInput.value.trim()) return alert("Título é obrigatório");
-
-  const today = new Date().toISOString().split("T")[0];
-  if (dateInput.value && dateInput.value < today)
-    return alert("Data não pode ser no passado");
-
-  if (editId) {
-    const t = tasks.find(x=>x.id===editId);
-    Object.assign(t,{
-      title:titleInput.value,
-      desc:descInput.value,
-      date:dateInput.value,
-      priority:priorityInput.value,
-      checklist:checklistTemp
-    });
-  } else {
-    tasks.push({
-      id:Date.now(),
-      title:titleInput.value,
-      desc:descInput.value,
-      date:dateInput.value,
-      priority:priorityInput.value,
-      checklist:checklistTemp,
-      status:"A Fazer"
-    });
-  }
-
-  persist();
-  closeModal();
-}
-
-function progress(t){
-  return t.checklist.length
-    ? Math.round(t.checklist.filter(c=>c.done).length/t.checklist.length*100)
-    : 0;
-}
-
-function render(){
-  document.querySelectorAll(".card").forEach(c=>c.remove());
-  tasks.forEach(t=>{
-    const p=progress(t);
-    const card=document.createElement("div");
-    card.className="card "+(p===100?"green":p>0?"yellow":"red");
-
-    card.innerHTML=`
-      <div class="card-header">
-        <span class="card-title">${t.title}</span>
-        <span class="badge ${t.priority}">${t.priority}</span>
-      </div>
-      <div class="details">▶ Detalhes</div>
-      <div class="detail-box hidden">
-        <div>${p}%</div>
-      </div>
-    `;
-
-    card.querySelector(".details").onclick=()=>{
-      card.querySelector(".detail-box").classList.toggle("hidden");
-    };
-
-    const box=card.querySelector(".detail-box");
-
-    t.checklist.forEach(c=>{
-      const l=document.createElement("label");
-      l.className="check";
-      const cb=document.createElement("input");
-      cb.type="checkbox";
-      cb.checked=c.done;
-      cb.onchange=()=>{c.done=cb.checked;persist()};
-      l.append(cb,c.text);
-      box.appendChild(l);
-    });
-
-    const act=document.createElement("div");
-    act.className="actions";
-    act.innerHTML=`
-      <button class="btn blue">Editar</button>
-      <button class="btn red">Excluir</button>
-    `;
-    act.children[0].onclick=()=>openModal(t);
-    act.children[1].onclick=()=>{if(confirm("Excluir?")){tasks=tasks.filter(x=>x.id!==t.id);persist()}}
-    box.appendChild(act);
-
-    document.querySelector(`[data-status="${t.status}"]`).appendChild(card);
-  });
-}
-
-document.querySelectorAll(".coluna").forEach(col=>{
-  col.ondragover=e=>e.preventDefault();
-  col.ondrop=e=>{
-    const id=e.dataTransfer.getData("id");
-    const t=tasks.find(x=>x.id==id);
-    t.status=col.dataset.status;
-    persist();
-  };
-});
-
-function persist(){
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-  render();
-}
-
-function exportCSV(){
-  let csv="Status;Título;Prioridade;Progresso\n";
-  tasks.forEach(t=>{
-    csv+=`${t.status};"${t.title}";${t.priority};${progress(t)}%\n`;
-  });
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([csv]));
-  a.download="tarefas.csv";
-  a.click();
-}
-
-render();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
-``
