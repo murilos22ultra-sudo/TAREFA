@@ -1,95 +1,88 @@
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f4f5f7;
+  color: #172b4d;
 }
 
 header {
-  background: #020617;
   padding: 16px;
-  text-align: center;
-  border-bottom: 1px solid #1e293b;
-}
-
-#nova-tarefa {
-  background: #020617;
-  padding: 16px;
-  border-bottom: 1px solid #1e293b;
-}
-
-#nova-tarefa input,
-#nova-tarefa select,
-#nova-tarefa button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  border: none;
-}
-
-#nova-tarefa input,
-#nova-tarefa select {
-  background: #020617;
-  color: #fff;
-  border: 1px solid #334155;
-}
-
-#nova-tarefa button {
-  background: #334155;
+  background: #026aa7;
   color: white;
+  text-align: center;
+}
+
+.new-task {
+  background: white;
+  padding: 16px;
+  border-bottom: 1px solid #dfe1e6;
+}
+
+.new-task input,
+.new-task select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #dfe1e6;
+}
+
+.check-input {
+  display: flex;
+  gap: 4px;
+}
+
+.check-input button {
+  padding: 8px 12px;
+}
+
+.btn-primary {
+  background: #5aac44;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-#nova-tarefa .primary {
-  background: #2563eb;
-}
-
-#nova-tarefa button:hover {
-  opacity: 0.9;
-}
-
 .kanban {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 16px;
   padding: 16px;
+  overflow-x: auto;
 }
 
 .coluna {
-  background: #020617;
-  border-radius: 10px;
-  padding: 12px;
-  border: 1px solid #1e293b;
+  background: #ebecf0;
+  padding: 8px;
+  border-radius: 6px;
+  min-width: 260px;
 }
 
 .coluna h2 {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #93c5fd;
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .card {
-  background: #020617;
-  padding: 12px;
-  margin-bottom: 12px;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
   border-left: 6px solid red;
-  border-radius: 8px;
   position: relative;
 }
 
-.card.red { border-left-color: #dc2626; }
-.card.yellow { border-left-color: #f59e0b; }
-.card.green { border-left-color: #16a34a; }
+.card.red { border-left-color: #eb5a46; }
+.card.yellow { border-left-color: #f2d600; }
+.card.green { border-left-color: #61bd4f; }
+
+.card strong {
+  font-size: 14px;
+}
 
 .check {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 13px;
 }
 
@@ -99,47 +92,32 @@ header {
 }
 
 .progress-bar {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #dfe1e6;
   height: 6px;
-  overflow: hidden;
+  border-radius: 3px;
 }
 
 .progress-fill {
   height: 100%;
-  background: #22c55e;
+  background: #61bd4f;
+  border-radius: 3px;
 }
 
 .badge {
   position: absolute;
   bottom: 6px;
   right: 6px;
-  padding: 3px 8px;
-  border-radius: 999px;
   font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
   color: white;
 }
 
-.badge.Alta { background: #dc2626; }
-.badge.Média { background: #f59e0b; color: #422006; }
-.badge.Baixa { background: #16a34a; }
+.badge.Alta { background: #eb5a46; }
+.badge.Média { background: #f2d600; color: #172b4d; }
+.badge.Baixa { background: #61bd4f; }
 
 footer {
   padding: 16px;
   text-align: center;
-}
-
-footer button {
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  background: #16a34a;
-  color: white;
-  cursor: pointer;
-}
-
-@media (max-width: 900px) {
-  .kanban {
-    grid-template-columns: 1fr;
-  }
 }
