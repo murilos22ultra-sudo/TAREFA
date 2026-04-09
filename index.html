@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>TAREFAS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ CSS carregado corretamente -->
-  <link rel="stylesheet" href="style.css<h1>TAREFAS</h1>
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>TAREFAS</h1>
   <div class="header-actions">
     <button class="btn blue" id="btnNovo">+ Criar tarefa</button>
     <button class="btn green" id="btnExport">Exportar Excel</button>
@@ -32,9 +37,9 @@
   <div class="modal-box">
     <h3>Cadastrar atividade</h3>
 
-    <input id="taskTitle" placeholder="Título" />
+    <input id="taskTitle" placeholder="Título">
     <textarea id="taskDesc" placeholder="Descrição"></textarea>
-    <input id="taskDate" type="date" />
+    <input id="taskDate" type="date">
 
     <select id="taskPriority">
       <option>Alta</option>
@@ -43,7 +48,7 @@
     </select>
 
     <div class="check-row">
-      <input id="checkInput" placeholder="Item do checklist" />
+      <input id="checkInput" placeholder="Item do checklist">
       <button class="btn gray" id="addCheck">Adicionar</button>
     </div>
 
@@ -56,8 +61,8 @@
   </div>
 </div>
 
-<!-- ✅ JS carregado corretamente NO FINAL -->
-script.js</script>
+<!-- JS -->
+<script src="script.js"></script>
 
 </body>
 </html>
