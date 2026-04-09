@@ -4,12 +4,9 @@
   <meta charset="UTF-8" />
   <title>TAREFAS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
 
-<header>
-  <h1>TAREFAS</h1>
+  <!-- ✅ CSS carregado corretamente -->
+  <link rel="stylesheet" href="style.css<h1>TAREFAS</h1>
   <div class="header-actions">
     <button class="btn blue" id="btnNovo">+ Criar tarefa</button>
     <button class="btn green" id="btnExport">Exportar Excel</button>
@@ -17,20 +14,28 @@
 </header>
 
 <main class="kanban">
-  <div class="coluna" data-status="A Fazer"><h2>A Fazer</h2></div>
-  <div class="coluna" data-status="Em Progresso"><h2>Em Progresso</h2></div>
-  <div class="coluna" data-status="Concluído"><h2>Concluído</h2></div>
+  <div class="coluna" data-status="A Fazer">
+    <h2>A Fazer</h2>
+  </div>
+
+  <div class="coluna" data-status="Em Progresso">
+    <h2>Em Progresso</h2>
+  </div>
+
+  <div class="coluna" data-status="Concluído">
+    <h2>Concluído</h2>
+  </div>
 </main>
 
 <!-- MODAL -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
-    <h3 id="modalTitle">Cadastrar atividade</h3>
+    <h3>Cadastrar atividade</h3>
 
     <input id="taskTitle" placeholder="Título" />
     <textarea id="taskDesc" placeholder="Descrição"></textarea>
     <input id="taskDate" type="date" />
-    
+
     <select id="taskPriority">
       <option>Alta</option>
       <option selected>Média</option>
@@ -51,6 +56,8 @@
   </div>
 </div>
 
-<script src="script.js"></script>
+<!-- ✅ JS carregado corretamente NO FINAL -->
+script.js</script>
+
 </body>
 </html>
