@@ -1,4 +1,6 @@
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -56,40 +58,32 @@ h1 { margin: 0; }
   font-size: 16px;
 }
 
-/* CARD */
+/* CARD BASE */
 .card {
   background: linear-gradient(180deg,#1f2937,#111827);
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 12px;
-  border-left: 4px solid #facc15;
+  border-left: 6px solid transparent;
 }
 
-.card.red { border-left-color:#ef4444; }
-.card.yellow { border-left-color:#facc15; }
-.card.green { border-left-color:#22c55e; }
+/* ✅ CORES POR STATUS */
+.card.red    { border-left-color: #ef4444; }
+.card.yellow { border-left-color: #facc15; }
+.card.green  { border-left-color: #22c55e; }
 
+/* HEADER CARD (DRAG) */
 .card-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  cursor: grab;
 }
 
-.card-title { font-weight: 600; }
-
-.card-desc {
-  font-size: 13px;
-  color: #cbd5f5;
-  margin-top: 6px;
-  line-height: 1.4;
+.card-title {
+  font-weight: 600;
 }
 
-.progress-text {
-  font-size: 12px;
-  margin: 6px 0;
-  color: #e5e7eb;
-}
-
-/* BADGE */
 .badge {
   font-size: 12px;
   padding: 4px 10px;
@@ -100,6 +94,23 @@ h1 { margin: 0; }
 .badge.Alta { background:#dc2626; }
 .badge.Média { background:#facc15; color:#111827; }
 .badge.Baixa { background:#22c55e; }
+
+/* DESCRIÇÃO */
+.card-desc {
+  font-size: 13px;
+  color: #cbd5f5;
+  margin-top: 6px;
+}
+
+/* PRAZO */
+.card-date {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.card-date.atrasado { color: #ef4444; }
+.card-date.proximo  { color: #facc15; }
+.card-date.normal   { color: #94a3b8; }
 
 /* DETALHES */
 .details {
@@ -115,6 +126,12 @@ h1 { margin: 0; }
   font-size: 12px;
   display: flex;
   gap: 6px;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 /* MODAL */
@@ -148,48 +165,7 @@ h1 { margin: 0; }
   margin-bottom:12px;
 }
 
-.modal-box textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.check-row {
-  display: flex;
-  gap: 10px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-.card-date {
-  font-size: 12px;
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-date.atrasado {
-  color: #ef4444;
-}
-
-.card-date.proximo {
-  color: #facc15;
-}
-
-.card-date.normal {
-  color: #94a3b8;
-}
-.card {
-  cursor: grab;
-}
-
-.card.dragging {
-  opacity: 0.5;
-}
-
+/* FEEDBACK DRAG */
 .coluna.drag-over {
   outline: 2px dashed #38bdf8;
 }
