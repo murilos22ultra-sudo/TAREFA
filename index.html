@@ -3,66 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <title>TAREFAS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ✅ CSS carregado corretamente -->
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: radial-gradient(circle at top, #0b1324, #05070f);
+      color: #e5e7eb;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .btn {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding: 24px 32px;
+    }
+
+    .coluna {
+      background: linear-gradient(180deg, #111827, #0b1324);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .card {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-left: 4px solid #facc15;
+    }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-box {
+      background: #020617;
+      padding: 20px;
+      border-radius: 12px;
+      width: 300px;
+    }
+
+    .modal-box input,
+    .modal-box select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    .check-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    ul {
+      padding-left: 16px;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
 
 <header>
   <h1>TAREFAS</h1>
-  <button class="btn-primary" onclick="abrirModal()">+ Criar tarefa</button>
+  <button class="btn" onclick="abrirModal()">+ Criar tarefa</button>
 </header>
 
 <main class="kanban">
-  <div class="coluna" data-status="A Fazer">
-    <h2>A Fazer</h2>
-    <div class="cards"></div>
+  <div class="coluna">
+    <h3>A Fazer</h3>
+    <div id="cards"></div>
   </div>
-
-  <div class="coluna" data-status="Em Progresso">
-    <h2>Em Progresso</h2>
-    <div class="cards"></div>
-  </div>
-
-  <div class="coluna" data-status="Concluído">
-    <h2>Concluído</h2>
-    <div class="cards"></div>
-  </div>
+  <div class="coluna"><h3>Em Progresso</h3></div>
+  <div class="coluna"><h3>Concluído</h3></div>
 </main>
 
 <!-- MODAL -->
 <div id="modal" class="modal hidden">
-  <div class="modal-content">
+  <div class="modal-box">
     <h3>Criar tarefa</h3>
 
     <input id="titulo" placeholder="Título da tarefa">
 
     <select id="prioridade">
-      <option value="Alta">Alta</option>
-      <option value="Média" selected>Média</option>
-      <option value="Baixa">Baixa</option>
+      <option>Média</option>
+      <option>Alta</option>
+      <option>Baixa</option>
     </select>
 
     <div class="check-row">
-      <input id="check-item" placeholder="Item do checklist">
-      <button type="button" onclick="addChecklist()">+</button>
+      <input id="checkItem" placeholder="Item do checklist">
+      <button onclick="addChecklist()">+</button>
     </div>
 
-    <ul id="lista-checklist"></ul>
+    <ul id="listaChecklist"></ul>
 
-    <div class="modal-actions">
-      <button type="button" onclick="fecharModal()">Cancelar</button>
-      <button type="button" class="btn-primary" onclick="criarTarefa()">
-        Adicionar tarefa
-      </button>
+    <div style="display:flex; gap:8px; margin-top:10px">
+      <button onclick="fecharModal()">Cancelar</button>
+      <button class="btn" onclick="criarTarefa()">Adicionar tarefa</button>
     </div>
   </div>
 </div>
 
-<!-- ✅ JS carregado corretamente -->
-<script src="script.js"></script>
+<script>
+  const tarefas = [];
+  let checklistTemp = [];
+
+  function abrirModal() {
+    document.getElementById("modal").classList.remove("hidden");
+  }
+
+  function fecharModal() {
+    document.getElementById("modal").classList.add("hidden");
+  }
+
+  function addChecklist() {
+    const input = document.getElementById("checkItem");
+    if (!input.value.trim()) return;
+
+    checklistTemp.push(input.value);
+    input.value = "";
+    renderChecklist();
+  }
+
+  function renderChecklist() {
+    const ul = document.getElementById("listaChecklist");
+    ul.innerHTML = "";
+    checklistTemp.forEach(i => {
+      const li = document.createElement("li");
+      li.textContent = i;
+      ul.appendChild(li);
+    });
+  }
+
+  function criarTarefa() {
+    const titulo = document.getElementById("titulo").value.trim();
+
+    if (!titulo) {
+      alert("Digite um título!");
+      return;
+    }
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = "<strong>" + titulo + "</strong>";
+
+    document.getElementById("cards").appendChild(card);
+
+    document.getElementById("titulo").value = "";
+    checklistTemp = [];
+    renderChecklist();
+    fecharModal();
+  }
+</script>
+
 </body>
 </html>
-``
