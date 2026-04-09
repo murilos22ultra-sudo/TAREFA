@@ -63,7 +63,6 @@ function renderTempChecks() {
   checklistTemp.forEach(i => {
     const div = document.createElement("div");
     div.textContent = "• " + i.text;
-    div.style.fontSize = "13px";
     checkPreview.appendChild(div);
   });
 }
@@ -73,7 +72,7 @@ function renderTempChecks() {
 // ================================
 function saveTask() {
   if (!titleInput.value.trim()) {
-    alert("Título é obrigatório");
+    alert("Título obrigatório");
     return;
   }
 
@@ -104,20 +103,13 @@ function saveTask() {
 // ================================
 // UTILITÁRIOS
 // ================================
-function getProgress(task) {
-  if (!task.checklist.length) return 0;
-  return Math.round(
-    (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
-  );
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  const [y, m, d] = dateStr.split("-");
+  const [y,m,d] = dateStr.split("-");
   return `${d}/${m}/${y}`;
 }
 
-// ✅ COR DA BARRA PELO STATUS
+// 🔥 COR DA BARRA = STATUS
 function statusClass(status) {
   if (status === "A Fazer") return "red";
   if (status === "Em Progresso") return "yellow";
@@ -126,22 +118,17 @@ function statusClass(status) {
 }
 
 // ================================
-// RENDERIZAÇÃO DOS CARDS
+// RENDER
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
   tasks.forEach(task => {
-    const column = document.querySelector(
-      `[data-status="${task.status}"]`
-    );
-
-    const progress = getProgress(task);
+    const col = document.querySelector(`[data-status="${task.status}"]`);
 
     const card = document.createElement("div");
-    card.className = `card ${statusClass(task.status)}`;
+    card.className = "card " + statusClass(task.status);
 
-    // DRAG PELO HEADER
     card.innerHTML = `
       <div class="card-header" draggable="true" data-id="${task.id}">
         <span class="card-title">${task.title}</span>
@@ -155,66 +142,52 @@ function render() {
       <div class="details">▶ Detalhes</div>
 
       <div class="detail-box hidden">
-        <div class="progress-text">${progress}%</div>
-        <div class="bar"><div style="width:${progress}%"></div></div>
+        <div class="actions">
+          <button class="btn blue">Editar</button>
+          <button class="btn red">Excluir</button>
+        </div>
       </div>
     `;
 
-    // DRAG EVENTS
+    // DRAG
     const header = card.querySelector(".card-header");
     header.addEventListener("dragstart", e => {
       e.dataTransfer.setData("text/plain", task.id);
       e.dataTransfer.effectAllowed = "move";
     });
 
-    const detailBox = card.querySelector(".detail-box");
-
     card.querySelector(".details").onclick = () =>
-      detailBox.classList.toggle("hidden");
+      card.querySelector(".detail-box").classList.toggle("hidden");
 
-    // checklist
-    task.checklist.forEach(c => {
-      const label = document.createElement("label");
-      label.className = "check";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = c.done;
-      cb.onchange = () => {
-        c.done = cb.checked;
-        persist();
-      };
-      label.append(cb, c.text);
-      detailBox.appendChild(label);
-    });
-
-    // ações
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    actions.innerHTML = `
-      <button class="btn blue">Editar</button>
-      <button class="btn red">Excluir</button>
-    `;
-    actions.children[0].onclick = () => openModal(task);
-    actions.children[1].onclick = () => {
+    card.querySelector(".actions .btn.blue").onclick = () => openModal(task);
+    card.querySelector(".actions .btn.red").onclick = () => {
       if (confirm("Excluir tarefa?")) {
         tasks = tasks.filter(t => t.id !== task.id);
         persist();
       }
     };
-    detailBox.appendChild(actions);
 
-    column.appendChild(card);
+    col.appendChild(card);
   });
 }
 
 // ================================
-// DROP NAS COLUNAS
+// DRAG & DROP NAS COLUNAS
 // ================================
 document.querySelectorAll(".coluna").forEach(coluna => {
-  coluna.addEventListener("dragover", e => e.preventDefault());
+  coluna.addEventListener("dragover", e => {
+    e.preventDefault();
+    coluna.classList.add("drag-over");
+  });
+
+  coluna.addEventListener("dragleave", () => {
+    coluna.classList.remove("drag-over");
+  });
 
   coluna.addEventListener("drop", e => {
     e.preventDefault();
+    coluna.classList.remove("drag-over");
+
     const id = e.dataTransfer.getData("text/plain");
     const task = tasks.find(t => t.id == id);
     if (!task) return;
@@ -233,13 +206,14 @@ function persist() {
 }
 
 // ================================
-// EXPORTAR CSV
+// EXPORT CSV
 // ================================
 function exportCSV() {
   let csv = "Status;Título;Descrição\n";
   tasks.forEach(t => {
     csv += `${t.status};"${t.title}";"${t.desc || ""}"\n`;
   });
+
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv]));
   a.download = "tarefas.csv";
