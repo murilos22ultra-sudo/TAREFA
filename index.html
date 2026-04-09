@@ -2,34 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Kanban Trello Style</title>
+  <title>Tarefas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>Kanban de Tarefas</h1>
+  <h1>TAREFAS</h1>
+  <button class="btn-primary" onclick="abrirModal()">+ Criar tarefa</button>
 </header>
-
-<section class="new-task">
-  <input id="titulo" placeholder="Título da tarefa">
-
-  <select id="prioridade">
-    <option value="Alta">Alta</option>
-    <option value="Média" selected>Média</option>
-    <option value="Baixa">Baixa</option>
-  </select>
-
-  <div class="check-input">
-    <input id="check-item" placeholder="Item do checklist">
-    <button onclick="addChecklistTemp()">+</button>
-  </div>
-
-  <ul id="lista-checklist"></ul>
-
-  <button class="btn-primary" onclick="criarTarefa()">Adicionar tarefa</button>
-</section>
 
 <main class="kanban">
   <div class="coluna" data-status="A Fazer">
@@ -48,11 +30,33 @@
   </div>
 </main>
 
-<footer>
-  <button onclick="exportarCSV()">Exportar CSV</button>
-</footer>
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Criar tarefa</h3>
+
+    <input id="titulo" placeholder="Título da tarefa">
+
+    <select id="prioridade">
+      <option value="Alta">Alta</option>
+      <option value="Média" selected>Média</option>
+      <option value="Baixa">Baixa</option>
+    </select>
+
+    <div class="check-row">
+      <input id="check-item" placeholder="Item do checklist">
+      <button onclick="addChecklist()">+</button>
+    </div>
+
+    <ul id="lista-checklist"></ul>
+
+    <div class="modal-actions">
+      <button onclick="fecharModal()">Cancelar</button>
+      <button class="btn-primary" onclick="criarTarefa()">Adicionar tarefa</button>
+    </div>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
 </html>
-``
