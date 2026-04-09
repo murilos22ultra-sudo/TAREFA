@@ -1,0 +1,145 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+header {
+  background: #020617;
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+#nova-tarefa {
+  background: #020617;
+  padding: 16px;
+  border-bottom: 1px solid #1e293b;
+}
+
+#nova-tarefa input,
+#nova-tarefa select,
+#nova-tarefa button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+#nova-tarefa input,
+#nova-tarefa select {
+  background: #020617;
+  color: #fff;
+  border: 1px solid #334155;
+}
+
+#nova-tarefa button {
+  background: #334155;
+  color: white;
+  cursor: pointer;
+}
+
+#nova-tarefa .primary {
+  background: #2563eb;
+}
+
+#nova-tarefa button:hover {
+  opacity: 0.9;
+}
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.coluna {
+  background: #020617;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #1e293b;
+}
+
+.coluna h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #93c5fd;
+}
+
+.card {
+  background: #020617;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-left: 6px solid red;
+  border-radius: 8px;
+  position: relative;
+}
+
+.card.red { border-left-color: #dc2626; }
+.card.yellow { border-left-color: #f59e0b; }
+.card.green { border-left-color: #16a34a; }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.progress {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.progress-bar {
+  background: #1e293b;
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #22c55e;
+}
+
+.badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: white;
+}
+
+.badge.Alta { background: #dc2626; }
+.badge.Média { background: #f59e0b; color: #422006; }
+.badge.Baixa { background: #16a34a; }
+
+footer {
+  padding: 16px;
+  text-align: center;
+}
+
+footer button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #16a34a;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .kanban {
+    grid-template-columns: 1fr;
+  }
+}
