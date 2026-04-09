@@ -49,7 +49,7 @@ function closeModal() {
 }
 
 // ================================
-// CHECKLIST (MODAL)
+// CHECKLIST
 // ================================
 function addCheck() {
   if (!checkInput.value.trim()) return;
@@ -112,7 +112,7 @@ function saveTask() {
 }
 
 // ================================
-// PROGRESSO
+// UTILITÁRIOS
 // ================================
 function getProgress(task) {
   if (!task.checklist.length) return 0;
@@ -121,8 +121,30 @@ function getProgress(task) {
   );
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function prazoClass(dateStr) {
+  if (!dateStr) return "normal";
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const prazo = new Date(dateStr);
+  prazo.setHours(0, 0, 0, 0);
+
+  const diff = (prazo - hoje) / (1000 * 60 * 60 * 24);
+
+  if (diff < 0) return "atrasado";
+  if (diff <= 1) return "proximo";
+  return "normal";
+}
+
 // ================================
-// RENDERIZAÇÃO DOS CARDS
+// RENDERIZAÇÃO
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
@@ -133,21 +155,23 @@ function render() {
     );
 
     const progress = getProgress(task);
+    const dateClass = prazoClass(task.date);
 
     const card = document.createElement("div");
     card.className =
       "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
 
-    // ✅ DESCRIÇÃO INSERIDA AQUI
     card.innerHTML = `
       <div class="card-header">
         <span class="card-title">${task.title}</span>
         <span class="badge ${task.priority}">${task.priority}</span>
       </div>
 
+      ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
+
       ${
-        task.desc
-          ? `<div class="card-desc">${task.desc}</div>`
+        task.date
+          ? `<div class="card-date ${dateClass}">📅 Prazo: ${formatDate(task.date)}</div>`
           : ""
       }
 
@@ -163,7 +187,6 @@ function render() {
 
     const detailBox = card.querySelector(".detail-box");
 
-    // Checklist dentro dos detalhes
     task.checklist.forEach(item => {
       const label = document.createElement("label");
       label.className = "check";
@@ -180,7 +203,6 @@ function render() {
       detailBox.appendChild(label);
     });
 
-    // Ações
     const actions = document.createElement("div");
     actions.className = "actions";
     actions.innerHTML = `
@@ -198,7 +220,6 @@ function render() {
 
     detailBox.appendChild(actions);
 
-    // Toggle detalhes
     card.querySelector(".details").onclick = () => {
       detailBox.classList.toggle("hidden");
     };
@@ -232,11 +253,11 @@ function persist() {
 // EXPORTAR CSV
 // ================================
 function exportCSV() {
-  let csv = "Status;Título;Descrição;Prioridade;Progresso\n";
+  let csv = "Status;Título;Descrição;Prazo;Prioridade;Progresso\n";
 
   tasks.forEach(t => {
     const p = getProgress(t);
-    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.priority};${p}%\n`;
+    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.date || ""};${t.priority};${p}%\n`;
   });
 
   const a = document.createElement("a");
@@ -246,6 +267,6 @@ function exportCSV() {
 }
 
 // ================================
-// INICIALIZA
+// INICIALIZAÇÃO
 // ================================
 render();
