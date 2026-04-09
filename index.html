@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Kanban de Tarefas</title>
+  <title>Kanban Trello Style</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +12,7 @@
   <h1>Kanban de Tarefas</h1>
 </header>
 
-<section id="nova-tarefa">
+<section class="new-task">
   <input id="titulo" placeholder="Título da tarefa">
 
   <select id="prioridade">
@@ -21,12 +21,14 @@
     <option value="Baixa">Baixa</option>
   </select>
 
-  <input id="check-item" placeholder="Item do checklist">
-  <button onclick="addChecklistTemp()">Adicionar item</button>
+  <div class="check-input">
+    <input id="check-item" placeholder="Item do checklist">
+    <button onclick="addChecklistTemp()">+</button>
+  </div>
 
   <ul id="lista-checklist"></ul>
 
-  <button class="primary" onclick="criarTarefa()">Criar tarefa</button>
+  <button class="btn-primary" onclick="criarTarefa()">Adicionar tarefa</button>
 </section>
 
 <main class="kanban">
@@ -47,9 +49,10 @@
 </main>
 
 <footer>
-  <button onclick="exportarCSV()">Exportar para Excel</button>
+  <button onclick="exportarCSV()">Exportar CSV</button>
 </footer>
 
 <script src="script.js"></script>
 </body>
 </html>
+``
