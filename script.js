@@ -208,14 +208,44 @@ function persist() {
 
 /* EXPORT */
 function exportCSV() {
-  let csv = "Status;Título;Descrição\n";
-  tasks.forEach(t => {
-    csv += `${t.status};"${t.title}";"${t.desc || ""}"\n`;
+  let csv = "Status;Título;Descrição;Prazo;Prioridade;Checklist;Progresso\n";
+
+  tasks.forEach(task => {
+
+    // Progresso
+    const progress = task.checklist.length
+      ? Math.round(
+          (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
+        )
+      : 0;
+
+    // Checklist formatado
+    const checklistText = task.checklist.length
+      ? task.checklist
+          .map(i => (i.done ? "☑ " : "☐ ") + i.text)
+          .join(" | ")
+      : "";
+
+    // Data formatada
+    const prazo = task.date
+      ? task.date.split("-").reverse().join("/")
+      : "";
+
+    csv +=
+      `${task.status};` +
+      `"${task.title}";` +
+      `"${task.desc || ""}";` +
+      `"${prazo}";` +
+      `${task.priority};` +
+      `"${checklistText}";` +
+      `${progress}%\n`;
   });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv]));
-  a.download = "tarefas.csv";
-  a.click();
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "tarefas_kanban.csv";
+  link.click();
 }
 
 render();
