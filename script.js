@@ -1,12 +1,12 @@
 // ================================
-// ESTADO
+// ESTADO GLOBAL
 // ================================
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let checklistTemp = [];
 let editId = null;
 
 // ================================
-// ELEMENTOS
+// ELEMENTOS DO MODAL
 // ================================
 const modal = document.getElementById("modal");
 const titleInput = document.getElementById("taskTitle");
@@ -19,10 +19,10 @@ const checkPreview = document.getElementById("checkPreview");
 // ================================
 // BOTÕES
 // ================================
-document.getElementById("btnNovo").onclick = () => openModal();
-document.getElementById("cancel").onclick = () => closeModal();
-document.getElementById("addCheck").onclick = () => addCheck();
-document.getElementById("save").onclick = () => saveTask();
+document.getElementById("btnNovo").onclick   = () => openModal();
+document.getElementById("cancel").onclick    = () => closeModal();
+document.getElementById("addCheck").onclick  = () => addCheck();
+document.getElementById("save").onclick      = () => saveTask();
 document.getElementById("btnExport").onclick = () => exportCSV();
 
 // ================================
@@ -30,15 +30,12 @@ document.getElementById("btnExport").onclick = () => exportCSV();
 // ================================
 function openModal(task = null) {
   editId = task ? task.id : null;
-
   titleInput.value = task?.title || "";
   descInput.value = task?.desc || "";
   dateInput.value = task?.date || "";
   priorityInput.value = task?.priority || "Média";
-
   checklistTemp = task ? [...task.checklist] : [];
   renderTempChecks();
-
   modal.classList.remove("hidden");
 }
 
@@ -73,21 +70,18 @@ function renderTempChecks() {
 // ================================
 function saveTask() {
   if (!titleInput.value.trim()) {
-    alert("Título obrigatório");
+    alert("Título é obrigatório");
     return;
   }
 
   if (editId) {
-    Object.assign(
-      tasks.find(t => t.id === editId),
-      {
-        title: titleInput.value,
-        desc: descInput.value,
-        date: dateInput.value,
-        priority: priorityInput.value,
-        checklist: checklistTemp
-      }
-    );
+    Object.assign(tasks.find(t => t.id === editId), {
+      title: titleInput.value,
+      desc: descInput.value,
+      date: dateInput.value,
+      priority: priorityInput.value,
+      checklist: checklistTemp
+    });
   } else {
     tasks.push({
       id: Date.now(),
@@ -105,78 +99,82 @@ function saveTask() {
 }
 
 // ================================
-// UTIL
+// UTILITÁRIOS
 // ================================
-function progress(task) {
+function getProgress(task) {
   if (!task.checklist.length) return 0;
-  return Math.round(task.checklist.filter(i => i.done).length / task.checklist.length * 100);
+  return Math.round(
+    (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
+  );
 }
 
-function persist() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  render();
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
 }
 
 // ================================
-// RENDER + DRAG
+// RENDER (COM DRAG PELO HEADER)
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
   tasks.forEach(task => {
-    const col = document.querySelector(`[data-status="${task.status}"]`);
-    const p = progress(task);
+    const column = document.querySelector(`[data-status="${task.status}"]`);
+    const progress = getProgress(task);
 
     const card = document.createElement("div");
-    card.className = `card ${p === 100 ? "green" : p > 0 ? "yellow" : "red"}`;
-
-    /* ✅ DRAG FUNCIONAL */
-    card.draggable = true;
-
-    card.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", task.id);
-      e.dataTransfer.effectAllowed = "move";
-      card.classList.add("dragging");
-    });
-
-    card.addEventListener("dragend", () => {
-      card.classList.remove("dragging");
-    });
+    card.className =
+      "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
 
     card.innerHTML = `
-      <div class="card-header">
+      <div class="card-header" draggable="true" data-id="${task.id}">
         <span class="card-title">${task.title}</span>
         <span class="badge ${task.priority}">${task.priority}</span>
       </div>
 
       ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
 
-      ${task.date ? `<div class="card-date normal">📅 ${task.date.split("-").reverse().join("/")}</div>` : ""}
+      ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
 
       <div class="details">▶ Detalhes</div>
 
       <div class="detail-box hidden">
-        <div>${p}%</div>
-        <div class="bar"><div style="width:${p}%"></div></div>
+        <div>${progress}%</div>
+        <div class="bar"><div style="width:${progress}%"></div></div>
       </div>
     `;
 
-    const box = card.querySelector(".detail-box");
+    // ===== DRAG PELO HEADER (FUNCIONA SEMPRE) =====
+    const header = card.querySelector(".card-header");
 
-    task.checklist.forEach(c => {
-      const l = document.createElement("label");
-      l.className = "check";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = c.done;
-      cb.onchange = () => {
-        c.done = cb.checked;
-        persist();
-      };
-      l.append(cb, c.text);
-      box.appendChild(l);
+    header.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", task.id);
+      e.dataTransfer.effectAllowed = "move";
     });
 
+    // ===== DETALHES =====
+    const detailBox = card.querySelector(".detail-box");
+    card.querySelector(".details").onclick = () =>
+      detailBox.classList.toggle("hidden");
+
+    // checklist
+    task.checklist.forEach(item => {
+      const label = document.createElement("label");
+      label.className = "check";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = item.done;
+      cb.onchange = () => {
+        item.done = cb.checked;
+        persist();
+      };
+      label.append(cb, item.text);
+      detailBox.appendChild(label);
+    });
+
+    // ações
     const actions = document.createElement("div");
     actions.className = "actions";
     actions.innerHTML = `
@@ -190,36 +188,36 @@ function render() {
         persist();
       }
     };
+    detailBox.appendChild(actions);
 
-    box.appendChild(actions);
-
-    card.querySelector(".details").onclick = () => {
-      box.classList.toggle("hidden");
-    };
-
-    col.appendChild(card);
+    column.appendChild(card);
   });
 }
 
 // ================================
 // DROP NAS COLUNAS
 // ================================
-document.querySelectorAll(".coluna").forEach(col => {
-  col.addEventListener("dragover", e => {
-    e.preventDefault();
-  });
+document.querySelectorAll(".coluna").forEach(coluna => {
+  coluna.addEventListener("dragover", e => e.preventDefault());
 
-  col.addEventListener("drop", e => {
+  coluna.addEventListener("drop", e => {
     e.preventDefault();
-
     const id = e.dataTransfer.getData("text/plain");
     const task = tasks.find(t => t.id == id);
     if (!task) return;
 
-    task.status = col.dataset.status;
+    task.status = coluna.dataset.status;
     persist();
   });
 });
+
+// ================================
+// PERSISTÊNCIA
+// ================================
+function persist() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  render();
+}
 
 // ================================
 // EXPORT CSV
@@ -229,7 +227,6 @@ function exportCSV() {
   tasks.forEach(t => {
     csv += `${t.status};"${t.title}";"${t.desc || ""}"\n`;
   });
-
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv]));
   a.download = "tarefas.csv";
