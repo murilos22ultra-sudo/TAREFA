@@ -49,16 +49,11 @@ function closeModal() {
 }
 
 // ================================
-// CHECKLIST
+// CHECKLIST (MODAL)
 // ================================
 function addCheck() {
   if (!checkInput.value.trim()) return;
-
-  checklistTemp.push({
-    text: checkInput.value,
-    done: false
-  });
-
+  checklistTemp.push({ text: checkInput.value, done: false });
   checkInput.value = "";
   renderTempChecks();
 }
@@ -82,19 +77,13 @@ function saveTask() {
     return;
   }
 
-  const today = new Date().toISOString().split("T")[0];
-  if (dateInput.value && dateInput.value < today) {
-    alert("A data não pode ser no passado");
-    return;
-  }
-
   if (editId) {
     const t = tasks.find(x => x.id === editId);
     t.title = titleInput.value;
     t.desc = descInput.value;
     t.date = dateInput.value;
     t.priority = priorityInput.value;
-    t.checklist = checklistTemp;
+    t.checklist = [...checklistTemp];
   } else {
     tasks.push({
       id: Date.now(),
@@ -102,7 +91,7 @@ function saveTask() {
       desc: descInput.value,
       date: dateInput.value,
       priority: priorityInput.value,
-      checklist: checklistTemp,
+      checklist: [...checklistTemp],
       status: "A Fazer"
     });
   }
@@ -112,7 +101,7 @@ function saveTask() {
 }
 
 // ================================
-// UTILITÁRIOS
+// PROGRESSO E PRAZO
 // ================================
 function getProgress(task) {
   if (!task.checklist.length) return 0;
@@ -122,7 +111,7 @@ function getProgress(task) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return null;
+  if (!dateStr) return "";
   const [y, m, d] = dateStr.split("-");
   return `${d}/${m}/${y}`;
 }
@@ -132,7 +121,6 @@ function prazoClass(dateStr) {
 
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
-
   const prazo = new Date(dateStr);
   prazo.setHours(0, 0, 0, 0);
 
@@ -144,7 +132,7 @@ function prazoClass(dateStr) {
 }
 
 // ================================
-// RENDERIZAÇÃO
+// RENDERIZAÇÃO DOS CARDS
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
@@ -161,6 +149,18 @@ function render() {
     card.className =
       "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
 
+    card.setAttribute("draggable", "true");
+
+    // ===== DRAG START / END =====
+    card.addEventListener("dragstart", () => {
+      card.classList.add("dragging");
+      card.dataset.id = task.id;
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+    });
+
     card.innerHTML = `
       <div class="card-header">
         <span class="card-title">${task.title}</span>
@@ -169,12 +169,11 @@ function render() {
 
       ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
 
-      ${task.date
-          ? `<div class="card-date ${dateClass}">
+      ${task.date ? `
+        <div class="card-date ${dateClass}">
           📅 Prazo: ${formatDate(task.date)}
-          </div>`
-          : ""
-      }
+        </div>
+      ` : ""}
 
       <div class="details">▶ Detalhes</div>
 
@@ -188,6 +187,7 @@ function render() {
 
     const detailBox = card.querySelector(".detail-box");
 
+    // checklist nos detalhes
     task.checklist.forEach(item => {
       const label = document.createElement("label");
       label.className = "check";
@@ -204,6 +204,7 @@ function render() {
       detailBox.appendChild(label);
     });
 
+    // ações
     const actions = document.createElement("div");
     actions.className = "actions";
     actions.innerHTML = `
@@ -213,7 +214,7 @@ function render() {
 
     actions.children[0].onclick = () => openModal(task);
     actions.children[1].onclick = () => {
-      if (confirm("Deseja excluir esta tarefa?")) {
+      if (confirm("Excluir tarefa?")) {
         tasks = tasks.filter(t => t.id !== task.id);
         persist();
       }
@@ -230,16 +231,32 @@ function render() {
 }
 
 // ================================
-// DRAG & DROP
+// DRAG & DROP NAS COLUNAS
 // ================================
-document.querySelectorAll(".coluna").forEach(col => {
-  col.ondragover = e => e.preventDefault();
-  col.ondrop = e => {
-    const id = e.dataTransfer.getData("id");
-    const t = tasks.find(x => x.id == id);
-    t.status = col.dataset.status;
+document.querySelectorAll(".coluna").forEach(coluna => {
+  coluna.addEventListener("dragover", e => {
+    e.preventDefault();
+    coluna.classList.add("drag-over");
+  });
+
+  coluna.addEventListener("dragleave", () => {
+    coluna.classList.remove("drag-over");
+  });
+
+  coluna.addEventListener("drop", e => {
+    e.preventDefault();
+    coluna.classList.remove("drag-over");
+
+    const draggedCard = document.querySelector(".card.dragging");
+    if (!draggedCard) return;
+
+    const taskId = draggedCard.dataset.id;
+    const task = tasks.find(t => t.id == taskId);
+    if (!task) return;
+
+    task.status = coluna.dataset.status;
     persist();
-  };
+  });
 });
 
 // ================================
@@ -255,10 +272,8 @@ function persist() {
 // ================================
 function exportCSV() {
   let csv = "Status;Título;Descrição;Prazo;Prioridade;Progresso\n";
-
   tasks.forEach(t => {
-    const p = getProgress(t);
-    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.date || ""};${t.priority};${p}%\n`;
+    csv += `${t.status};"${t.title}";"${t.desc || ""}";${t.date || ""};${t.priority};${getProgress(t)}%\n`;
   });
 
   const a = document.createElement("a");
@@ -268,6 +283,6 @@ function exportCSV() {
 }
 
 // ================================
-// INICIALIZAÇÃO
+// INICIALIZA
 // ================================
 render();
