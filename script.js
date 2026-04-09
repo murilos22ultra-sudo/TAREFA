@@ -36,7 +36,7 @@ function closeModal() {
   checkPreview.innerHTML = "";
 }
 
-/* CHECKLIST MODAL */
+/* CHECKLIST NO MODAL */
 function addCheck() {
   if (!checkInput.value.trim()) return;
   checklistTemp.push({ text: checkInput.value, done: false });
@@ -53,7 +53,7 @@ function renderTempChecks() {
   });
 }
 
-/* SALVAR */
+/* SALVAR TAREFA */
 function saveTask() {
   if (!titleInput.value.trim()) return alert("Título obrigatório");
 
@@ -76,6 +76,7 @@ function saveTask() {
       status: "A Fazer"
     });
   }
+
   persist();
   closeModal();
 }
@@ -85,29 +86,29 @@ function statusClass(status) {
   if (status === "A Fazer") return "red";
   if (status === "Em Progresso") return "yellow";
   if (status === "Concluído") return "green";
+  return "red";
 }
 
 function progress(task) {
   if (!task.checklist.length) return 0;
   return Math.round(
-    (task.checklist.filter(c => c.done).length / task.checklist.length) * 100
+    (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
   );
 }
 
-function formatDate(d) {
-  if (!d) return "";
-  const [y, m, day] = d.split("-");
-  return `${day}/${m}/${y}`;
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
 }
 
-/* RENDER COMPLETO */
+/* RENDER */
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
   // reset contadores
   document.querySelectorAll(".coluna").forEach(col => {
-    const title = col.querySelector("h2");
-    title.innerHTML = title.textContent.split("(")[0].trim();
+    col.querySelector("h2").innerHTML = col.dataset.status;
   });
 
   tasks.forEach(task => {
@@ -118,36 +119,38 @@ function render() {
     card.className = "card " + statusClass(task.status);
 
     card.innerHTML = `
-  <div class="card-header" draggable="true">
-    <span class="card-title">${task.title}</span>
-    <span class="badge ${task.priority}">${task.priority}</span>
-  </div>
-
-  ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
-
-  ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
-
-  ${task.checklist.length > 0 ? `
-    <div class="progress-wrapper">
-      <div class="progress-bar">
-        <div class="progress-fill" style="width:${p}%"></div>
+      <div class="card-header" draggable="true">
+        <span class="card-title">${task.title}</span>
+        <span class="badge ${task.priority}">${task.priority}</span>
       </div>
-      <div class="progress-text">${p}% concluído</div>
-    </div>
-  ` : ""}
 
-  <div class="details">▶ Detalhes</div>
-  <div class="detail-box hidden"></div>
-`;
+      ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
+      ${task.date ? `<div class="card-date normal">📅 ${formatDate(task.date)}</div>` : ""}
+
+      ${
+        task.checklist.length > 0
+          ? `
+            <div class="progress-wrapper">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:${p}%"></div>
+              </div>
+              <div class="progress-text">${p}% concluído</div>
+            </div>
+          `
+          : ""
+      }
+
+      <div class="details">▶ Detalhes</div>
+      <div class="detail-box hidden"></div>
     `;
 
-    // DRAG
+    /* DRAG */
     card.querySelector(".card-header").addEventListener("dragstart", e => {
       e.dataTransfer.setData("id", task.id);
     });
 
+    /* CHECKLIST NOS DETALHES */
     const box = card.querySelector(".detail-box");
-
     task.checklist.forEach(i => {
       const lbl = document.createElement("label");
       lbl.className = "check";
@@ -162,6 +165,7 @@ function render() {
       box.appendChild(lbl);
     });
 
+    /* AÇÕES */
     const actions = document.createElement("div");
     actions.className = "actions";
     actions.innerHTML = `
@@ -183,12 +187,11 @@ function render() {
     col.appendChild(card);
   });
 
-  // atualizar contadores
+  /* CONTADOR POR COLUNA */
   document.querySelectorAll(".coluna").forEach(col => {
-    const status = col.dataset.status;
-    const total = tasks.filter(t => t.status === status).length;
-    const h2 = col.querySelector("h2");
-    h2.innerHTML = `${status} <span class="count">(${total})</span>`;
+    const total = tasks.filter(t => t.status === col.dataset.status).length;
+    col.querySelector("h2").innerHTML =
+      `${col.dataset.status} <span class="count">(${total})</span>`;
   });
 }
 
@@ -209,46 +212,26 @@ function persist() {
   render();
 }
 
-/* EXPORT */
+/* EXPORT CSV */
 function exportCSV() {
   let csv = "Status;Título;Descrição;Prazo;Prioridade;Checklist;Progresso\n";
 
   tasks.forEach(task => {
-
-    // Progresso
-    const progress = task.checklist.length
-      ? Math.round(
-          (task.checklist.filter(i => i.done).length / task.checklist.length) * 100
-        )
-      : 0;
-
-    // Checklist formatado
-    const checklistText = task.checklist.length
-      ? task.checklist
-          .map(i => (i.done ? "☑ " : "☐ ") + i.text)
-          .join(" | ")
-      : "";
-
-    // Data formatada
-    const prazo = task.date
-      ? task.date.split("-").reverse().join("/")
-      : "";
+    const prog = progress(task);
+    const prazo = task.date ? formatDate(task.date) : "";
+    const checklistText = task.checklist
+      .map(i => (i.done ? "☑ " : "☐ ") + i.text)
+      .join(" | ");
 
     csv +=
-      `${task.status};` +
-      `"${task.title}";` +
-      `"${task.desc || ""}";` +
-      `"${prazo}";` +
-      `${task.priority};` +
-      `"${checklistText}";` +
-      `${progress}%\n`;
+      `${task.status};"${task.title}";"${task.desc || ""}";"${prazo}";` +
+      `${task.priority};"${checklistText}";${prog}%\n`;
   });
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "tarefas_kanban.csv";
-  link.click();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv]));
+  a.download = "tarefas_kanban.csv";
+  a.click();
 }
 
 render();
