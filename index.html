@@ -6,135 +6,137 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== RESET ===== */
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Arial;
+  background:radial-gradient(circle at top,#0b1324,#05070f);
+  color:#fff
 }
 
-/* ===== BACKGROUND ===== */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  background: radial-gradient(circle at top, #0b1324, #05070f);
-  color: #e5e7eb;
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:24px 40px
+}
+header h1{margin:0;font-size:28px}
+.header-actions{display:flex;gap:12px}
+.btn{
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  gap:6px;
+  align-items:center
+}
+.btn.blue{background:#2563eb;color:#fff}
+.btn.green{background:#16a34a;color:#fff}
+
+/* KANBAN */
+.kanban{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:32px;
+  padding:0 40px 40px
+}
+.coluna{
+  background:linear-gradient(180deg,#0f172a,#020617);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35)
+}
+.coluna h2{margin-top:0;font-size:16px}
+
+/* CARD */
+.card{
+  background:linear-gradient(180deg,#1f2937,#111827);
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
+  border-left:4px solid #facc15;
+}
+.card.red{border-left-color:#ef4444}
+.card.yellow{border-left-color:#facc15}
+.card.green{border-left-color:#22c55e}
+
+.card-info{
+  display:flex;
+  flex-direction:column;
+  gap:6px
+}
+.card-title{font-weight:600;font-size:14px}
+.progress-text{font-size:12px;color:#cbd5f5}
+.bar{
+  height:6px;
+  background:#334155;
+  border-radius:4px;
+  overflow:hidden
+}
+.bar div{
+  height:100%;
+  background:#22c55e
 }
 
-/* ===== HEADER ===== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 32px;
+/* BADGE */
+.badge{
+  padding:4px 10px;
+  font-size:12px;
+  border-radius:999px;
+  font-weight:600;
+  white-space:nowrap
+}
+.badge.Alta{background:#dc2626}
+.badge.Média{background:#facc15;color:#111827}
+.badge.Baixa{background:#22c55e}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+.hidden{display:none}
+.modal-box{
+  background:#020617;
+  padding:24px;
+  width:340px;
+  border-radius:14px
+}
+.modal-box h3{margin-top:0}
+.modal-box input,
+.modal-box select{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:10px;
+  background:#111827;
+  color:#fff
+}
+.row{display:flex;gap:6px}
+.row button{flex-shrink:0}
+
+/* CHECKLIST */
+.check-item{
+  font-size:12px;
+  display:flex;
+  gap:6px;
+  align-items:center
 }
 
-header h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.btn-primary {
-  background: #2563eb;
-  border: none;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-primary:hover {
-  background: #1d4ed8;
-}
-
-/* ===== KANBAN ===== */
-.kanban {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 24px 32px;
-}
-
-/* ===== COLUNAS ===== */
-.coluna {
-  background: linear-gradient(180deg, #111827, #0b1324);
-  border-radius: 16px;
-  padding: 16px;
-  min-height: 300px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-
-.coluna h3 {
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* ===== CARD ===== */
-.card {
-  background: linear-gradient(180deg, #1f2937, #111827);
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.45);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border-left: 4px solid #facc15;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.6);
-}
-
-/* ===== MODAL ===== */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hidden {
-  display: none;
-}
-
-.modal-box {
-  background: #020617;
-  border-radius: 14px;
-  padding: 24px;
-  width: 320px;
-}
-
-.modal-box h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-
-.modal-box input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  margin-bottom: 12px;
-  background: #111827;
-  color: #e5e7eb;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-
-.btn-secondary {
-  background: #374151;
-  border: none;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
+@media(max-width:1000px){
+  .kanban{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -143,18 +145,21 @@ header h1 {
 
 <header>
   <h1>TAREFAS</h1>
-  <button id="btnAbrir" class="btn-primary">+ Criar tarefa</button>
+  <div class="header-actions">
+    <button class="btn blue" id="btnCriar">+ Criar tarefa</button>
+    <button class="btn green">⬇ Exportar Excel</button>
+  </div>
 </header>
 
 <main class="kanban">
-  <div class="coluna" id="colA">
-    <h3>A Fazer</h3>
+  <div class="coluna" data-status="A Fazer">
+    <h2>A Fazer</h2>
   </div>
-  <div class="coluna">
-    <h3>Em Progresso</h3>
+  <div class="coluna" data-status="Em Progresso">
+    <h2>Em Progresso</h2>
   </div>
-  <div class="coluna">
-    <h3>Concluído</h3>
+  <div class="coluna" data-status="Concluído">
+    <h2>Concluído</h2>
   </div>
 </main>
 
@@ -163,50 +168,125 @@ header h1 {
   <div class="modal-box">
     <h3>Criar tarefa</h3>
 
-    <input id="inputTitulo" placeholder="Título da tarefa">
+    <input id="titulo" placeholder="Título">
+    <select id="prioridade">
+      <option>Alta</option>
+      <option selected>Média</option>
+      <option>Baixa</option>
+    </select>
 
-    <div class="modal-actions">
-      <button id="btnCancelar" class="btn-secondary">Cancelar</button>
-      <button id="btnSalvar" class="btn-primary">Salvar</button>
+    <div class="row">
+      <input id="checkText" placeholder="Checklist">
+      <button id="addCheck" class="btn blue">+</button>
+    </div>
+
+    <div id="checkList"></div>
+
+    <div class="row" style="margin-top:12px">
+      <button id="cancelar" class="btn">Cancelar</button>
+      <button id="salvar" class="btn blue">Salvar</button>
     </div>
   </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+let tasks=[];
+let tempChecklist=[];
 
-  const btnAbrir = document.getElementById("btnAbrir");
-  const btnCancelar = document.getElementById("btnCancelar");
-  const btnSalvar = document.getElementById("btnSalvar");
-  const modal = document.getElementById("modal");
-  const inputTitulo = document.getElementById("inputTitulo");
-  const colA = document.getElementById("colA");
+const modal=document.getElementById("modal");
+const btnCriar=document.getElementById("btnCriar");
+const btnSalvar=document.getElementById("salvar");
+const btnCancel=document.getElementById("cancelar");
+const btnAddCheck=document.getElementById("addCheck");
+const checkList=document.getElementById("checkList");
 
-  btnAbrir.addEventListener("click", () => {
-    inputTitulo.value = "";
-    modal.classList.remove("hidden");
+btnCriar.onclick=()=>{modal.classList.remove("hidden");tempChecklist=[];checkList.innerHTML="";}
+btnCancel.onclick=()=>modal.classList.add("hidden");
+
+btnAddCheck.onclick=()=>{
+  const text=document.getElementById("checkText").value.trim();
+  if(!text)return;
+  tempChecklist.push({text,done:false});
+  document.getElementById("checkText").value="";
+  renderTempCheck();
+};
+
+function renderTempCheck(){
+  checkList.innerHTML="";
+  tempChecklist.forEach(i=>{
+    const d=document.createElement("div");
+    d.textContent="• "+i.text;
+    d.style.fontSize="12px";
+    checkList.appendChild(d);
   });
+}
 
-  btnCancelar.addEventListener("click", () => {
-    modal.classList.add("hidden");
+btnSalvar.onclick=()=>{
+  const title=document.getElementById("titulo").value.trim();
+  if(!title)return alert("Digite um título");
+  tasks.push({
+    id:Date.now(),
+    title,
+    priority:document.getElementById("prioridade").value,
+    checklist:JSON.parse(JSON.stringify(tempChecklist)),
+    status:"A Fazer"
   });
+  document.getElementById("titulo").value="";
+  modal.classList.add("hidden");
+  render();
+};
 
-  btnSalvar.addEventListener("click", () => {
-    const titulo = inputTitulo.value.trim();
+function render(){
+  document.querySelectorAll(".card").forEach(c=>c.remove());
 
-    if (!titulo) {
-      alert("Digite um título");
-      return;
-    }
+  tasks.forEach(task=>{
+    const col=document.querySelector(`[data-status="${task.status}"]`);
+    const progress=task.checklist.length
+      ? Math.round(task.checklist.filter(i=>i.done).length/task.checklist.length*100)
+      : 0;
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.textContent = titulo;
+    const card=document.createElement("div");
+    card.className="card "+(progress===100?"green":progress>0?"yellow":"red");
+    card.draggable=true;
+    card.ondragstart=e=>e.dataTransfer.setData("id",task.id);
 
-    colA.appendChild(card);
-    modal.classList.add("hidden");
+    const info=document.createElement("div");
+    info.className="card-info";
+
+    info.innerHTML=`
+      <div class="card-title">${task.title}</div>
+      <div class="progress-text">${progress}%</div>
+      <div class="bar"><div style="width:${progress}%"></div></div>
+    `;
+
+    task.checklist.forEach(i=>{
+      const l=document.createElement("label");
+      l.className="check-item";
+      const c=document.createElement("input");
+      c.type="checkbox";
+      c.checked=i.done;
+      c.onchange=()=>{i.done=c.checked;render();}
+      l.append(c,i.text);
+      info.appendChild(l);
+    });
+
+    const badge=document.createElement("span");
+    badge.className="badge "+task.priority;
+    badge.textContent=task.priority;
+
+    card.append(info,badge);
+    col.appendChild(card);
   });
+}
 
+document.querySelectorAll(".coluna").forEach(col=>{
+  col.ondragover=e=>e.preventDefault();
+  col.ondrop=e=>{
+    const id=e.dataTransfer.getData("id");
+    const t=tasks.find(x=>x.id==id);
+    t.status=col.dataset.status;
+    render();
+  };
 });
 </script>
 
