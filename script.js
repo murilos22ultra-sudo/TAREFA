@@ -30,12 +30,15 @@ document.getElementById("btnExport").onclick = () => exportCSV();
 // ================================
 function openModal(task = null) {
   editId = task ? task.id : null;
+
   titleInput.value = task?.title || "";
   descInput.value = task?.desc || "";
   dateInput.value = task?.date || "";
   priorityInput.value = task?.priority || "Média";
+
   checklistTemp = task ? [...task.checklist] : [];
   renderTempChecks();
+
   modal.classList.remove("hidden");
 }
 
@@ -114,20 +117,31 @@ function formatDate(dateStr) {
   return `${d}/${m}/${y}`;
 }
 
+// ✅ COR DA BARRA PELO STATUS
+function statusClass(status) {
+  if (status === "A Fazer") return "red";
+  if (status === "Em Progresso") return "yellow";
+  if (status === "Concluído") return "green";
+  return "red";
+}
+
 // ================================
-// RENDER (COM DRAG PELO HEADER)
+// RENDERIZAÇÃO DOS CARDS
 // ================================
 function render() {
   document.querySelectorAll(".card").forEach(c => c.remove());
 
   tasks.forEach(task => {
-    const column = document.querySelector(`[data-status="${task.status}"]`);
+    const column = document.querySelector(
+      `[data-status="${task.status}"]`
+    );
+
     const progress = getProgress(task);
 
     const card = document.createElement("div");
-    card.className =
-      "card " + (progress === 100 ? "green" : progress > 0 ? "yellow" : "red");
+    card.className = `card ${statusClass(task.status)}`;
 
+    // DRAG PELO HEADER
     card.innerHTML = `
       <div class="card-header" draggable="true" data-id="${task.id}">
         <span class="card-title">${task.title}</span>
@@ -141,36 +155,35 @@ function render() {
       <div class="details">▶ Detalhes</div>
 
       <div class="detail-box hidden">
-        <div>${progress}%</div>
+        <div class="progress-text">${progress}%</div>
         <div class="bar"><div style="width:${progress}%"></div></div>
       </div>
     `;
 
-    // ===== DRAG PELO HEADER (FUNCIONA SEMPRE) =====
+    // DRAG EVENTS
     const header = card.querySelector(".card-header");
-
     header.addEventListener("dragstart", e => {
       e.dataTransfer.setData("text/plain", task.id);
       e.dataTransfer.effectAllowed = "move";
     });
 
-    // ===== DETALHES =====
     const detailBox = card.querySelector(".detail-box");
+
     card.querySelector(".details").onclick = () =>
       detailBox.classList.toggle("hidden");
 
     // checklist
-    task.checklist.forEach(item => {
+    task.checklist.forEach(c => {
       const label = document.createElement("label");
       label.className = "check";
       const cb = document.createElement("input");
       cb.type = "checkbox";
-      cb.checked = item.done;
+      cb.checked = c.done;
       cb.onchange = () => {
-        item.done = cb.checked;
+        c.done = cb.checked;
         persist();
       };
-      label.append(cb, item.text);
+      label.append(cb, c.text);
       detailBox.appendChild(label);
     });
 
@@ -220,7 +233,7 @@ function persist() {
 }
 
 // ================================
-// EXPORT CSV
+// EXPORTAR CSV
 // ================================
 function exportCSV() {
   let csv = "Status;Título;Descrição\n";
