@@ -52,8 +52,10 @@ function render() {
 
   tarefas.forEach((t, index) => {
     const pct = progresso(t.checklist);
+    const cor = pct === 100 ? "green" : pct > 0 ? "yellow" : "red";
+
     const card = document.createElement("div");
-    card.className = `card ${pct === 100 ? "green" : pct > 0 ? "yellow" : "red"}`;
+    card.className = `card ${cor}`;
 
     card.innerHTML = `
       <strong>${t.titulo}</strong>
@@ -64,20 +66,15 @@ function render() {
     `;
 
     t.checklist.forEach(i => {
-      const chk = document.createElement("label");
-      chk.className = "check";
-
-      const box = document.createElement("input");
-      box.type = "checkbox";
-      box.checked = i.ok;
-      box.onchange = () => {
-        i.ok = box.checked;
-        salvar();
-      };
-
-      chk.appendChild(box);
-      chk.appendChild(document.createTextNode(" " + i.texto));
-      card.appendChild(chk);
+      const lbl = document.createElement("label");
+      lbl.className = "check";
+      const chk = document.createElement("input");
+      chk.type = "checkbox";
+      chk.checked = i.ok;
+      chk.onchange = () => { i.ok = chk.checked; salvar(); };
+      lbl.appendChild(chk);
+      lbl.appendChild(document.createTextNode(" " + i.texto));
+      card.appendChild(lbl);
     });
 
     const badge = document.createElement("span");
@@ -94,7 +91,6 @@ function exportarCSV() {
   tarefas.forEach(t => {
     csv += `${t.status};"${t.titulo}";${t.prioridade};${progresso(t.checklist)}%\n`;
   });
-
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -103,3 +99,4 @@ function exportarCSV() {
 }
 
 render();
+``
