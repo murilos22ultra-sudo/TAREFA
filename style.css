@@ -1,6 +1,4 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -16,13 +14,7 @@ header {
   align-items: center;
   padding: 24px 40px;
 }
-
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
-
-h1 { margin: 0; }
+.header-actions { display: flex; gap: 12px; }
 
 /* BOTÕES */
 .btn {
@@ -32,11 +24,10 @@ h1 { margin: 0; }
   cursor: pointer;
   font-size: 14px;
 }
-
-.btn.blue { background: #2563eb; color: #fff; }
-.btn.green { background: #16a34a; color: #fff; }
-.btn.gray { background: #334155; color: #e5e7eb; }
-.btn.red { background: #dc2626; color: #fff; }
+.btn.blue { background:#2563eb; color:#fff; }
+.btn.green{ background:#16a34a; color:#fff; }
+.btn.gray { background:#334155; color:#e5e7eb; }
+.btn.red  { background:#dc2626; color:#fff; }
 
 /* KANBAN */
 .kanban {
@@ -45,20 +36,13 @@ h1 { margin: 0; }
   gap: 32px;
   padding: 0 40px 40px;
 }
-
 .coluna {
   background: linear-gradient(180deg,#0f172a,#020617);
   border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
-.coluna h2 {
-  margin-top: 0;
-  font-size: 16px;
-}
-
-/* CARD BASE */
+/* CARD */
 .card {
   background: linear-gradient(180deg,#1f2937,#111827);
   border-radius: 10px;
@@ -67,84 +51,74 @@ h1 { margin: 0; }
   border-left: 6px solid transparent;
 }
 
-/* ✅ CORES POR STATUS */
-.card.red    { border-left-color: #ef4444; }
-.card.yellow { border-left-color: #facc15; }
-.card.green  { border-left-color: #22c55e; }
+/* Cor por STATUS */
+.card.red    { border-left-color:#ef4444; }
+.card.yellow { border-left-color:#facc15; }
+.card.green  { border-left-color:#22c55e; }
 
-/* HEADER CARD (DRAG) */
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: grab;
+  display:flex;
+  justify-content:space-between;
+  cursor:grab;
 }
-
-.card-title {
-  font-weight: 600;
-}
+.card-title { font-weight:600; }
 
 .badge {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 600;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:600;
 }
+.badge.Alta{background:#dc2626;}
+.badge.Média{background:#facc15;color:#111827;}
+.badge.Baixa{background:#22c55e;}
 
-.badge.Alta { background:#dc2626; }
-.badge.Média { background:#facc15; color:#111827; }
-.badge.Baixa { background:#22c55e; }
-
-/* DESCRIÇÃO */
 .card-desc {
-  font-size: 13px;
-  color: #cbd5f5;
-  margin-top: 6px;
+  font-size:13px;
+  color:#cbd5f5;
+  margin-top:6px;
 }
 
-/* PRAZO */
 .card-date {
-  font-size: 12px;
-  margin-top: 4px;
+  font-size:12px;
+  margin-top:4px;
 }
+.card-date.atrasado{color:#ef4444;}
+.card-date.proximo{color:#facc15;}
+.card-date.normal{color:#94a3b8;}
 
-.card-date.atrasado { color: #ef4444; }
-.card-date.proximo  { color: #facc15; }
-.card-date.normal   { color: #94a3b8; }
-
-/* DETALHES */
 .details {
-  font-size: 12px;
-  color: #c7d2fe;
-  cursor: pointer;
-  margin-top: 6px;
+  font-size:12px;
+  color:#c7d2fe;
+  cursor:pointer;
+  margin-top:6px;
 }
 
-.detail-box.hidden { display: none; }
+.detail-box.hidden { display:none; }
 
 .check {
-  font-size: 12px;
-  display: flex;
-  gap: 6px;
+  font-size:12px;
+  display:flex;
+  gap:6px;
+  margin-top:4px;
 }
 
 .actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
+  display:flex;
+  gap:6px;
+  margin-top:10px;
 }
 
 /* MODAL */
 .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
-.hidden { display: none; }
+.hidden{display:none;}
 
 .modal-box {
   background:#020617;
@@ -152,20 +126,29 @@ h1 { margin: 0; }
   padding:24px;
   width:420px;
 }
-
 .modal-box input,
 .modal-box textarea,
 .modal-box select {
-  width: 100%;
+  width:100%;
   background:#1e293b;
   border:none;
   border-radius:8px;
   padding:12px;
-  color:#e5e7eb;
   margin-bottom:12px;
+  color:#e5e7eb;
 }
 
-/* FEEDBACK DRAG */
+.check-row {
+  display:flex;
+  gap:10px;
+}
+
+.modal-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+}
+
 .coluna.drag-over {
-  outline: 2px dashed #38bdf8;
+  outline:2px dashed #38bdf8;
 }
