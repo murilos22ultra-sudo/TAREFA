@@ -1,94 +1,152 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Kanban</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>TAREFAS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #ffffff;
-    }
+<style>
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+}
 
-    header {
-      padding: 16px 24px;
-      background: #020617;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+/* ===== BACKGROUND ===== */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1324, #05070f);
+  color: #e5e7eb;
+}
 
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+}
 
-    .kanban {
-      display: flex;
-      gap: 16px;
-      padding: 24px;
-    }
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
 
-    .coluna {
-      background: #111827;
-      padding: 16px;
-      border-radius: 8px;
-      width: 33%;
-      min-height: 200px;
-    }
+.btn-primary {
+  background: #2563eb;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
 
-    .card {
-      background: #1f2937;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
+.btn-primary:hover {
+  background: #1d4ed8;
+}
 
-    /* MODAL */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+/* ===== KANBAN ===== */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 24px 32px;
+}
 
-    .hidden {
-      display: none;
-    }
+/* ===== COLUNAS ===== */
+.coluna {
+  background: linear-gradient(180deg, #111827, #0b1324);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 300px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
 
-    .modal-box {
-      background: #020617;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-    }
+.coluna h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
 
-    .modal-box input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      border: none;
-    }
-  </style>
+/* ===== CARD ===== */
+.card {
+  background: linear-gradient(180deg, #1f2937, #111827);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-left: 4px solid #facc15;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.6);
+}
+
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #020617;
+  border-radius: 14px;
+  padding: 24px;
+  width: 320px;
+}
+
+.modal-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 12px;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.btn-secondary {
+  background: #374151;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
 <header>
   <h1>TAREFAS</h1>
-  <button id="btnAbrir">+ Criar tarefa</button>
+  <button id="btnAbrir" class="btn-primary">+ Criar tarefa</button>
 </header>
 
-<div class="kanban">
+<main class="kanban">
   <div class="coluna" id="colA">
     <h3>A Fazer</h3>
   </div>
@@ -98,7 +156,7 @@
   <div class="coluna">
     <h3>Concluído</h3>
   </div>
-</div>
+</main>
 
 <!-- MODAL -->
 <div id="modal" class="modal hidden">
@@ -107,9 +165,9 @@
 
     <input id="inputTitulo" placeholder="Título da tarefa">
 
-    <div style="display:flex; gap:8px;">
-      <button id="btnCancelar" style="background:#374151;">Cancelar</button>
-      <button id="btnSalvar">Salvar</button>
+    <div class="modal-actions">
+      <button id="btnCancelar" class="btn-secondary">Cancelar</button>
+      <button id="btnSalvar" class="btn-primary">Salvar</button>
     </div>
   </div>
 </div>
