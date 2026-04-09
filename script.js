@@ -169,9 +169,10 @@ function render() {
 
       ${task.desc ? `<div class="card-desc">${task.desc}</div>` : ""}
 
-      ${
-        task.date
-          ? `<div class="card-date ${dateClass}">📅 Prazo: ${formatDate(task.date)}</div>`
+      ${task.date
+          ? `<div class="card-date ${dateClass}">
+          📅 Prazo: ${formatDate(task.date)}
+          </div>`
           : ""
       }
 
