@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TAREFAS</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=5">
 </head>
 <body>
   <header>
@@ -16,45 +16,39 @@
     </div>
   </header>
 
-  <section class="lembretes-card">
-    <h2>LEMBRETES <span class="count" id="reminderCount">(0)</span></h2>
+  <section class="lembretes-card" aria-labelledby="tituloLembretes">
+    <h2 id="tituloLembretes">LEMBRETES <span class="count" id="reminderCount">(0)</span></h2>
     <div id="listaLembretes"></div>
   </section>
 
   <main class="kanban">
-    <div class="coluna" data-status="A Fazer">
-      <h2>A Fazer</h2>
-    </div>
-
-    <div class="coluna" data-status="Em Progresso">
-      <h2>Em Progresso</h2>
-    </div>
-
-    <div class="coluna" data-status="Concluído">
-      <h2>Concluído</h2>
-    </div>
+    <section class="coluna" data-status="A Fazer">
+      <h2>A Fazer (0)</h2>
+    </section>
+    <section class="coluna" data-status="Em Progresso">
+      <h2>Em Progresso (0)</h2>
+    </section>
+    <section class="coluna" data-status="Concluído">
+      <h2>Concluído (0)</h2>
+    </section>
   </main>
 
-  <div id="modal" class="modal hidden">
-    <div class="modal-box">
-      <h3>Cadastrar atividade</h3>
-      <input id="taskTitle" type="text" placeholder="Título">
+  <div id="modal" class="modal hidden" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+      <h3 id="taskModalTitle">Cadastrar atividade</h3>
+      <input id="taskTitle" type="text" placeholder="Título" autocomplete="off">
       <textarea id="taskDesc" placeholder="Descrição"></textarea>
       <input id="taskDate" type="date">
-
       <select id="taskPriority">
         <option>Alta</option>
         <option selected>Média</option>
         <option>Baixa</option>
       </select>
-
       <div class="check-row">
-        <input id="checkInput" type="text" placeholder="Item do checklist">
+        <input id="checkInput" type="text" placeholder="Item do checklist" autocomplete="off">
         <button class="btn gray" id="addCheck" type="button">Adicionar</button>
       </div>
-
       <div id="checkPreview"></div>
-
       <div class="modal-actions">
         <button class="btn gray" id="cancel" type="button">Cancelar</button>
         <button class="btn blue" id="save" type="button">Salvar</button>
@@ -62,13 +56,12 @@
     </div>
   </div>
 
-  <div id="modalLembrete" class="modal hidden">
-    <div class="modal-box">
-      <h3>Criar lembrete</h3>
-      <input id="lembreteTitulo" type="text" placeholder="Digite o lembrete">
+  <div id="modalLembrete" class="modal hidden" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="reminderModalTitle">
+      <h3 id="reminderModalTitle">Criar lembrete</h3>
+      <input id="lembreteTitulo" type="text" placeholder="Digite o lembrete" autocomplete="off">
       <input id="lembreteData" type="date">
       <input id="lembreteHora" type="time">
-
       <div class="modal-actions">
         <button class="btn gray" id="cancelarLembrete" type="button">Cancelar</button>
         <button class="btn purple" id="salvarLembrete" type="button">Salvar</button>
@@ -76,6 +69,6 @@
     </div>
   </div>
 
-  <script src="./script.js"></script>
+  <script src="./script.js?v=5" defer></script>
 </body>
 </html>
