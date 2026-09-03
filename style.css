@@ -1,275 +1,81 @@
-* {
-  box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAREFAS</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <h1>TAREFAS</h1>
+    <div class="header-actions">
+      <button class="btn blue" id="btnNovo" type="button">+ Criar tarefa</button>
+      <button class="btn purple" id="btnNovoLembrete" type="button">+ Criar lembrete</button>
+      <button class="btn green" id="btnExport" type="button">Exportar Excel</button>
+    </div>
+  </header>
 
-body {
-  margin: 0;
-  font-family: system-ui, Arial, sans-serif;
-  background: radial-gradient(circle at top, #0b1324, #05070f);
-  color: #e5e7eb;
-  min-height: 100vh;
-}
+  <section class="lembretes-card">
+    <h2>LEMBRETES <span class="count" id="reminderCount">(0)</span></h2>
+    <div id="listaLembretes"></div>
+  </section>
 
-/* HEADER */
-header {
-  padding: 24px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  <main class="kanban">
+    <div class="coluna" data-status="A Fazer">
+      <h2>A Fazer</h2>
+    </div>
 
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
+    <div class="coluna" data-status="Em Progresso">
+      <h2>Em Progresso</h2>
+    </div>
 
-/* BOTÕES */
-.btn {
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-size: 14px;
-}
+    <div class="coluna" data-status="Concluído">
+      <h2>Concluído</h2>
+    </div>
+  </main>
 
-.btn.blue { background: #2563eb; color: white; }
-.btn.green { background: #16a34a; color: white; }
-.btn.gray { background: #334155; color: #e5e7eb; }
-.btn.red { background: #dc2626; color: white; }
-.btn.purple { background: #7c3aed; color: white; }
-.btn.purple:hover { background: #6d28d9; }
-.btn.red:hover { background: #b91c1c; }
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Cadastrar atividade</h3>
+      <input id="taskTitle" type="text" placeholder="Título">
+      <textarea id="taskDesc" placeholder="Descrição"></textarea>
+      <input id="taskDate" type="date">
 
-/* LEMBRETES */
-.lembretes-card {
-  margin: 0 40px 32px;
-  padding: 20px;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  border: 1px solid #1e293b;
-  border-radius: 14px;
-}
+      <select id="taskPriority">
+        <option>Alta</option>
+        <option selected>Média</option>
+        <option>Baixa</option>
+      </select>
 
-.lembretes-card h2 {
-  margin: 0 0 16px;
-}
+      <div class="check-row">
+        <input id="checkInput" type="text" placeholder="Item do checklist">
+        <button class="btn gray" id="addCheck" type="button">Adicionar</button>
+      </div>
 
-#listaLembretes {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
+      <div id="checkPreview"></div>
 
-.empty-message {
-  color: #94a3b8;
-  font-size: 14px;
-  grid-column: 1 / -1;
-}
+      <div class="modal-actions">
+        <button class="btn gray" id="cancel" type="button">Cancelar</button>
+        <button class="btn blue" id="save" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
 
-.lembrete-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-width: 0;
-  padding: 14px;
-  background: linear-gradient(180deg, #1f2937, #111827);
-  border-left: 6px solid #7c3aed;
-  border-radius: 10px;
-}
+  <div id="modalLembrete" class="modal hidden">
+    <div class="modal-box">
+      <h3>Criar lembrete</h3>
+      <input id="lembreteTitulo" type="text" placeholder="Digite o lembrete">
+      <input id="lembreteData" type="date">
+      <input id="lembreteHora" type="time">
 
-.lembrete-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
+      <div class="modal-actions">
+        <button class="btn gray" id="cancelarLembrete" type="button">Cancelar</button>
+        <button class="btn purple" id="salvarLembrete" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
 
-.lembrete-info strong {
-  color: #e5e7eb;
-  overflow-wrap: anywhere;
-}
-
-.lembrete-data {
-  color: #94a3b8;
-  font-size: 12px;
-}
-
-.excluir-lembrete {
-  flex-shrink: 0;
-}
-
-/* KANBAN */
-.kanban {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  padding: 0 40px 40px;
-}
-
-.coluna {
-  min-height: 220px;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  border-radius: 14px;
-  padding: 20px;
-}
-
-.coluna h2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.count {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-/* CARD */
-.card {
-  background: linear-gradient(180deg, #1f2937, #111827);
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 12px;
-  border-left: 6px solid transparent;
-}
-
-.card.red { border-left-color: #ef4444; }
-.card.yellow { border-left-color: #facc15; }
-.card.green { border-left-color: #22c55e; }
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  cursor: grab;
-}
-
-.card-title {
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.badge {
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.badge.Alta { background: #dc2626; }
-.badge.Média { background: #facc15; color: #111827; }
-.badge.Baixa { background: #22c55e; }
-
-.card-desc {
-  font-size: 13px;
-  color: #cbd5f5;
-  margin-top: 6px;
-  overflow-wrap: anywhere;
-}
-
-.card-date {
-  font-size: 12px;
-  margin-top: 4px;
-  color: #94a3b8;
-}
-
-/* PROGRESSO */
-.progress-wrapper { margin-top: 8px; }
-.progress-bar {
-  height: 6px;
-  border-radius: 4px;
-  background: #334155;
-  overflow: hidden;
-}
-.progress-fill { height: 100%; background: #22c55e; }
-.progress-text { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-
-/* DETALHES */
-.details {
-  font-size: 12px;
-  color: #c7d2fe;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.detail-box.hidden, .hidden { display: none; }
-
-.check {
-  font-size: 12px;
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.modal.hidden { display: none; }
-
-.modal-box {
-  background: #020617;
-  border: 1px solid #1e293b;
-  border-radius: 14px;
-  padding: 24px;
-  width: 420px;
-  max-width: 100%;
-}
-
-.modal-box input,
-.modal-box textarea,
-.modal-box select {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: #1e293b;
-  color: #e5e7eb;
-}
-
-.modal-box textarea { min-height: 90px; resize: vertical; }
-
-.check-row { display: flex; gap: 10px; }
-.check-row input { margin-bottom: 12px; }
-.check-row .btn { height: 42px; }
-
-#checkPreview { margin-bottom: 12px; }
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-@media (max-width: 900px) {
-  header { align-items: flex-start; flex-direction: column; gap: 16px; }
-  .header-actions { flex-wrap: wrap; }
-  .kanban, #listaLembretes { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-  header { padding: 20px; }
-  .header-actions, .header-actions .btn { width: 100%; }
-  .lembretes-card { margin: 0 20px 24px; }
-  .kanban { padding: 0 20px 20px; }
-  .lembrete-item { align-items: stretch; flex-direction: column; }
-  .excluir-lembrete { width: 100%; }
-  .modal-actions { flex-direction: column-reverse; }
-  .modal-actions .btn { width: 100%; }
-  .check-row { flex-direction: column; gap: 0; }
-}
+  <script src="./script.js"></script>
+</body>
+</html>
