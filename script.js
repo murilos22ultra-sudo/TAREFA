@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let tasks = readStorage("tasks");
-  let reminders = readStorage("reminders");
+  let tasks = readList("tasks");
+  let reminders = readList("reminders");
   let checklistTemp = [];
-  let editId = null;
+  let editTaskId = null;
   let editReminderId = null;
 
   const modal = document.getElementById("modal");
+  const taskModalTitle = document.getElementById("taskModalTitle");
   const titleInput = document.getElementById("taskTitle");
   const descInput = document.getElementById("taskDesc");
   const dateInput = document.getElementById("taskDate");
@@ -14,23 +15,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkPreview = document.getElementById("checkPreview");
 
   const modalLembrete = document.getElementById("modalLembrete");
+  const reminderModalTitle = document.getElementById("reminderModalTitle");
+  const reminderSaveButton = document.getElementById("salvarLembrete");
   const lembreteTitulo = document.getElementById("lembreteTitulo");
   const lembreteData = document.getElementById("lembreteData");
   const lembreteHora = document.getElementById("lembreteHora");
   const listaLembretes = document.getElementById("listaLembretes");
   const reminderCount = document.getElementById("reminderCount");
 
-  document.getElementById("btnNovo").addEventListener("click", () => openModal());
-  document.getElementById("cancel").addEventListener("click", closeModal);
+  document.getElementById("btnNovo").addEventListener("click", () => openTaskModal());
+  document.getElementById("cancel").addEventListener("click", closeTaskModal);
   document.getElementById("addCheck").addEventListener("click", addCheck);
   document.getElementById("save").addEventListener("click", saveTask);
   document.getElementById("btnExport").addEventListener("click", exportCSV);
-
   document.getElementById("btnNovoLembrete").addEventListener("click", () => openReminderModal());
   document.getElementById("cancelarLembrete").addEventListener("click", closeReminderModal);
-  document.getElementById("salvarLembrete").addEventListener("click", saveReminder);
+  reminderSaveButton.addEventListener("click", saveReminder);
 
-  function readStorage(key) {
+  function readList(key) {
     try {
       const value = JSON.parse(localStorage.getItem(key));
       return Array.isArray(value) ? value : [];
@@ -40,21 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function openModal(task = null) {
-    editId = task ? task.id : null;
+  function showModal(element) {
+    element.hidden = false;
+    element.classList.remove("hidden");
+  }
+
+  function hideModal(element) {
+    element.hidden = true;
+    element.classList.add("hidden");
+  }
+
+  function openTaskModal(task = null) {
+    editTaskId = task ? task.id : null;
+    taskModalTitle.textContent = task ? "Editar atividade" : "Cadastrar atividade";
     titleInput.value = task?.title || "";
     descInput.value = task?.desc || "";
     dateInput.value = task?.date || "";
     priorityInput.value = task?.priority || "Média";
-    checklistTemp = task ? task.checklist.map(item => ({ ...item })) : [];
+    checklistTemp = Array.isArray(task?.checklist) ? task.checklist.map(item => ({ ...item })) : [];
     renderTempChecks();
-    modal.classList.remove("hidden");
+    showModal(modal);
     titleInput.focus();
   }
 
-  function closeModal() {
-    modal.classList.add("hidden");
-    editId = null;
+  function closeTaskModal() {
+    hideModal(modal);
+    editTaskId = null;
     checklistTemp = [];
     checkInput.value = "";
     checkPreview.innerHTML = "";
@@ -66,27 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
     checklistTemp.push({ text, done: false });
     checkInput.value = "";
     renderTempChecks();
-    checkInput.focus();
   }
 
   function renderTempChecks() {
     checkPreview.innerHTML = "";
     checklistTemp.forEach((item, index) => {
       const row = document.createElement("div");
-      row.className = "check";
-
+      row.className = "check-preview-item";
       const text = document.createElement("span");
       text.textContent = `• ${item.text}`;
-
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "btn red";
-      remove.textContent = "Remover";
-      remove.addEventListener("click", () => {
+      const remove = makeButton("Remover", "btn red", () => {
         checklistTemp.splice(index, 1);
         renderTempChecks();
       });
-
       row.append(text, remove);
       checkPreview.appendChild(row);
     });
@@ -94,11 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function saveTask() {
     const title = titleInput.value.trim();
-    if (!title) {
-      alert("Título obrigatório");
-      titleInput.focus();
-      return;
-    }
+    if (!title) return alert("Título obrigatório");
 
     const data = {
       title,
@@ -108,156 +109,92 @@ document.addEventListener("DOMContentLoaded", () => {
       checklist: checklistTemp.map(item => ({ ...item }))
     };
 
-    if (editId !== null) {
-      const task = tasks.find(item => item.id === editId);
+    if (editTaskId !== null) {
+      const task = tasks.find(item => item.id === editTaskId);
       if (task) Object.assign(task, data);
     } else {
       tasks.push({ id: Date.now(), ...data, status: "A Fazer" });
     }
 
-    persistTasks();
-    closeModal();
-  }
-
-  function statusClass(status) {
-    if (status === "A Fazer") return "red";
-    if (status === "Em Progresso") return "yellow";
-    return "green";
-  }
-
-  function progress(task) {
-    if (!task.checklist || task.checklist.length === 0) return 0;
-    const completed = task.checklist.filter(item => item.done).length;
-    return Math.round((completed / task.checklist.length) * 100);
-  }
-
-  function formatDate(date) {
-    if (!date) return "";
-    const [year, month, day] = date.split("-");
-    return `${day}/${month}/${year}`;
+    saveTasks();
+    closeTaskModal();
   }
 
   function renderTasks() {
     document.querySelectorAll(".card").forEach(card => card.remove());
 
     tasks.forEach(task => {
-      if (!Array.isArray(task.checklist)) task.checklist = [];
-      if (!task.status) task.status = "A Fazer";
-
+      task.checklist = Array.isArray(task.checklist) ? task.checklist : [];
+      task.status = task.status || "A Fazer";
       const column = document.querySelector(`[data-status="${task.status}"]`);
       if (!column) return;
 
-      const percentage = progress(task);
-      const card = document.createElement("div");
+      const card = document.createElement("article");
       card.className = `card ${statusClass(task.status)}`;
 
       const header = document.createElement("div");
       header.className = "card-header";
       header.draggable = true;
-
       const title = document.createElement("span");
       title.className = "card-title";
       title.textContent = task.title;
-
       const badge = document.createElement("span");
       badge.className = `badge ${task.priority}`;
       badge.textContent = task.priority;
-
       header.append(title, badge);
-      header.addEventListener("dragstart", event => {
-        event.dataTransfer.setData("text/plain", String(task.id));
-      });
-
+      header.addEventListener("dragstart", event => event.dataTransfer.setData("text/plain", String(task.id)));
       card.appendChild(header);
 
-      if (task.desc) {
-        const description = document.createElement("div");
-        description.className = "card-desc";
-        description.textContent = task.desc;
-        card.appendChild(description);
-      }
+      if (task.desc) card.appendChild(textElement("div", "card-desc", task.desc));
+      if (task.date) card.appendChild(textElement("div", "card-date", `📅 ${formatDate(task.date)}`));
 
-      if (task.date) {
-        const date = document.createElement("div");
-        date.className = "card-date";
-        date.textContent = `📅 ${formatDate(task.date)}`;
-        card.appendChild(date);
-      }
-
-      if (task.checklist.length > 0) {
+      if (task.checklist.length) {
+        const percentage = progress(task);
         const wrapper = document.createElement("div");
         wrapper.className = "progress-wrapper";
-
         const bar = document.createElement("div");
         bar.className = "progress-bar";
-
         const fill = document.createElement("div");
         fill.className = "progress-fill";
         fill.style.width = `${percentage}%`;
-
-        const progressText = document.createElement("div");
-        progressText.className = "progress-text";
-        progressText.textContent = `${percentage}% concluído`;
-
         bar.appendChild(fill);
-        wrapper.append(bar, progressText);
+        wrapper.append(bar, textElement("div", "progress-text", `${percentage}% concluído`));
         card.appendChild(wrapper);
       }
 
-      const details = document.createElement("div");
-      details.className = "details";
-      details.textContent = "▶ Detalhes";
-
-      const detailBox = document.createElement("div");
-      detailBox.className = "detail-box hidden";
+      const details = textElement("div", "details", "▶ Detalhes");
+      const box = document.createElement("div");
+      box.className = "detail-box hidden";
 
       task.checklist.forEach(item => {
         const label = document.createElement("label");
         label.className = "check";
-
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = Boolean(item.done);
         checkbox.addEventListener("change", () => {
           item.done = checkbox.checked;
-          persistTasks();
+          saveTasks();
         });
-
-        const text = document.createElement("span");
-        text.textContent = item.text;
-        label.append(checkbox, text);
-        detailBox.appendChild(label);
+        label.append(checkbox, document.createTextNode(item.text));
+        box.appendChild(label);
       });
 
       const actions = document.createElement("div");
       actions.className = "actions";
-
-      const editButton = document.createElement("button");
-      editButton.type = "button";
-      editButton.className = "btn blue";
-      editButton.textContent = "Editar";
-      editButton.addEventListener("click", () => openModal(task));
-
-      const deleteButton = document.createElement("button");
-      deleteButton.type = "button";
-      deleteButton.className = "btn red";
-      deleteButton.textContent = "Excluir";
-      deleteButton.addEventListener("click", () => {
-        tasks = tasks.filter(item => item.id !== task.id);
-        persistTasks();
-      });
-
-      actions.append(editButton, deleteButton);
-      detailBox.appendChild(actions);
-
+      actions.append(
+        makeButton("Editar", "btn blue", () => openTaskModal(task)),
+        makeButton("Excluir", "btn red", () => {
+          tasks = tasks.filter(item => item.id !== task.id);
+          saveTasks();
+        })
+      );
+      box.appendChild(actions);
       details.addEventListener("click", () => {
-        detailBox.classList.toggle("hidden");
-        details.textContent = detailBox.classList.contains("hidden")
-          ? "▶ Detalhes"
-          : "▼ Detalhes";
+        box.classList.toggle("hidden");
+        details.textContent = box.classList.contains("hidden") ? "▶ Detalhes" : "▼ Detalhes";
       });
-
-      card.append(details, detailBox);
+      card.append(details, box);
       column.appendChild(card);
     });
 
@@ -267,58 +204,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function persistTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    renderTasks();
-  }
-
   function openReminderModal(reminder = null) {
     editReminderId = reminder ? reminder.id : null;
+    reminderModalTitle.textContent = reminder ? "Editar lembrete" : "Criar lembrete";
+    reminderSaveButton.textContent = reminder ? "Salvar alterações" : "Salvar";
     lembreteTitulo.value = reminder?.title || "";
     lembreteData.value = reminder?.date || "";
     lembreteHora.value = reminder?.time || "";
-
-    const modalTitle = modalLembrete.querySelector("h3");
-    const saveButton = document.getElementById("salvarLembrete");
-    modalTitle.textContent = reminder ? "Editar lembrete" : "Criar lembrete";
-    saveButton.textContent = reminder ? "Salvar alterações" : "Salvar";
-
-    modalLembrete.classList.remove("hidden");
+    showModal(modalLembrete);
     lembreteTitulo.focus();
   }
 
   function closeReminderModal() {
-    modalLembrete.classList.add("hidden");
+    hideModal(modalLembrete);
     editReminderId = null;
     lembreteTitulo.value = "";
     lembreteData.value = "";
     lembreteHora.value = "";
-    modalLembrete.querySelector("h3").textContent = "Criar lembrete";
-    document.getElementById("salvarLembrete").textContent = "Salvar";
   }
 
   function saveReminder() {
     const title = lembreteTitulo.value.trim();
-    if (!title) {
-      alert("Digite o lembrete.");
-      lembreteTitulo.focus();
-      return;
-    }
+    if (!title) return alert("Digite o lembrete.");
 
-    const reminderData = {
-      title,
-      date: lembreteData.value,
-      time: lembreteHora.value
-    };
-
+    const data = { title, date: lembreteData.value, time: lembreteHora.value };
     if (editReminderId !== null) {
       const reminder = reminders.find(item => item.id === editReminderId);
-      if (reminder) Object.assign(reminder, reminderData);
+      if (reminder) Object.assign(reminder, data);
     } else {
-      reminders.push({ id: Date.now(), ...reminderData });
+      reminders.push({ id: Date.now(), ...data });
     }
-
-    persistReminders();
+    saveReminders();
     closeReminderModal();
   }
 
@@ -326,86 +242,92 @@ document.addEventListener("DOMContentLoaded", () => {
     listaLembretes.innerHTML = "";
     reminderCount.textContent = `(${reminders.length})`;
 
-    if (reminders.length === 0) {
-      const empty = document.createElement("p");
-      empty.className = "empty-message";
-      empty.textContent = "Nenhum lembrete cadastrado.";
-      listaLembretes.appendChild(empty);
+    if (!reminders.length) {
+      listaLembretes.appendChild(textElement("p", "empty-message", "Nenhum lembrete cadastrado."));
       return;
     }
 
     reminders.forEach(reminder => {
-      const item = document.createElement("div");
+      const item = document.createElement("article");
       item.className = "lembrete-item";
-
       const info = document.createElement("div");
       info.className = "lembrete-info";
+      info.appendChild(textElement("strong", "", reminder.title));
+      const dateTime = [];
+      if (reminder.date) dateTime.push(formatDate(reminder.date));
+      if (reminder.time) dateTime.push(reminder.time);
+      if (dateTime.length) info.appendChild(textElement("span", "lembrete-data", dateTime.join(" às ")));
 
-      const title = document.createElement("strong");
-      title.textContent = reminder.title;
-      info.appendChild(title);
-
-      const dateTimeParts = [];
-      if (reminder.date) dateTimeParts.push(formatDate(reminder.date));
-      if (reminder.time) dateTimeParts.push(reminder.time);
-
-      if (dateTimeParts.length > 0) {
-        const dateTime = document.createElement("span");
-        dateTime.className = "lembrete-data";
-        dateTime.textContent = dateTimeParts.join(" às ");
-        info.appendChild(dateTime);
-      }
-
-      const reminderActions = document.createElement("div");
-      reminderActions.className = "lembrete-actions";
-
-      const editButton = document.createElement("button");
-      editButton.type = "button";
-      editButton.className = "btn blue editar-lembrete";
-      editButton.textContent = "Editar";
-      editButton.addEventListener("click", () => openReminderModal(reminder));
-
-      const deleteButton = document.createElement("button");
-      deleteButton.type = "button";
-      deleteButton.className = "btn red excluir-lembrete";
-      deleteButton.textContent = "Excluir";
-      deleteButton.addEventListener("click", () => {
-        reminders = reminders.filter(item => item.id !== reminder.id);
-        persistReminders();
-      });
-
-      reminderActions.append(editButton, deleteButton);
-      item.append(info, reminderActions);
+      const actions = document.createElement("div");
+      actions.className = "lembrete-actions";
+      actions.append(
+        makeButton("Editar", "btn blue", () => openReminderModal(reminder)),
+        makeButton("Excluir", "btn red", () => {
+          reminders = reminders.filter(item => item.id !== reminder.id);
+          saveReminders();
+        })
+      );
+      item.append(info, actions);
       listaLembretes.appendChild(item);
     });
   }
 
-  function persistReminders() {
+  function textElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = text;
+    return element;
+  }
+
+  function makeButton(text, className, handler) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = text;
+    button.addEventListener("click", handler);
+    return button;
+  }
+
+  function statusClass(status) {
+    return status === "A Fazer" ? "red" : status === "Em Progresso" ? "yellow" : "green";
+  }
+
+  function progress(task) {
+    if (!task.checklist.length) return 0;
+    return Math.round(task.checklist.filter(item => item.done).length / task.checklist.length * 100);
+  }
+
+  function formatDate(date) {
+    if (!date) return "";
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
+  function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderTasks();
+  }
+
+  function saveReminders() {
     localStorage.setItem("reminders", JSON.stringify(reminders));
     renderReminders();
   }
 
+  function csvField(value) {
+    return `"${String(value ?? "").replaceAll('"', '""')}"`;
+  }
+
   function exportCSV() {
     const lines = ["Status;Título;Descrição;Prazo;Prioridade;Checklist;Progresso"];
-
     tasks.forEach(task => {
-      const checklist = (task.checklist || [])
-        .map(item => `${item.done ? "☑" : "☐"} ${item.text}`)
-        .join(" | ");
-
+      const checklist = (task.checklist || []).map(item => `${item.done ? "☑" : "☐"} ${item.text}`).join(" | ");
       lines.push([
-        task.status,
-        task.title,
-        task.desc || "",
-        formatDate(task.date),
-        task.priority,
-        checklist,
-        `${progress(task)}%`
+        task.status, task.title, task.desc || "", formatDate(task.date),
+        task.priority, checklist, `${progress(task)}%`
       ].map(csvField).join(";"));
     });
-
-    const csv = "\uFEFF" + lines.join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = "tarefas_kanban.csv";
@@ -413,10 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-  }
-
-  function csvField(value) {
-    return `"${String(value ?? "").replaceAll('"', '""')}"`;
   }
 
   document.querySelectorAll(".coluna").forEach(column => {
@@ -427,18 +345,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const task = tasks.find(item => item.id === id);
       if (!task) return;
       task.status = column.dataset.status;
-      persistTasks();
+      saveTasks();
     });
   });
 
-  modal.addEventListener("click", event => {
-    if (event.target === modal) closeModal();
+  modal.addEventListener("click", event => { if (event.target === modal) closeTaskModal(); });
+  modalLembrete.addEventListener("click", event => { if (event.target === modalLembrete) closeReminderModal(); });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      closeTaskModal();
+      closeReminderModal();
+    }
   });
 
-  modalLembrete.addEventListener("click", event => {
-    if (event.target === modalLembrete) closeReminderModal();
-  });
-
+  hideModal(modal);
+  hideModal(modalLembrete);
   renderTasks();
   renderReminders();
 });
