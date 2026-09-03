@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let reminders = readStorage("reminders");
   let checklistTemp = [];
   let editId = null;
+  let editReminderId = null;
 
   const modal = document.getElementById("modal");
   const titleInput = document.getElementById("taskTitle");
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("save").addEventListener("click", saveTask);
   document.getElementById("btnExport").addEventListener("click", exportCSV);
 
-  document.getElementById("btnNovoLembrete").addEventListener("click", openReminderModal);
+  document.getElementById("btnNovoLembrete").addEventListener("click", () => openReminderModal());
   document.getElementById("cancelarLembrete").addEventListener("click", closeReminderModal);
   document.getElementById("salvarLembrete").addEventListener("click", saveReminder);
 
@@ -271,16 +272,29 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTasks();
   }
 
-  function openReminderModal() {
+  function openReminderModal(reminder = null) {
+    editReminderId = reminder ? reminder.id : null;
+    lembreteTitulo.value = reminder?.title || "";
+    lembreteData.value = reminder?.date || "";
+    lembreteHora.value = reminder?.time || "";
+
+    const modalTitle = modalLembrete.querySelector("h3");
+    const saveButton = document.getElementById("salvarLembrete");
+    modalTitle.textContent = reminder ? "Editar lembrete" : "Criar lembrete";
+    saveButton.textContent = reminder ? "Salvar alterações" : "Salvar";
+
     modalLembrete.classList.remove("hidden");
     lembreteTitulo.focus();
   }
 
   function closeReminderModal() {
     modalLembrete.classList.add("hidden");
+    editReminderId = null;
     lembreteTitulo.value = "";
     lembreteData.value = "";
     lembreteHora.value = "";
+    modalLembrete.querySelector("h3").textContent = "Criar lembrete";
+    document.getElementById("salvarLembrete").textContent = "Salvar";
   }
 
   function saveReminder() {
@@ -291,12 +305,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    reminders.push({
-      id: Date.now(),
+    const reminderData = {
       title,
       date: lembreteData.value,
       time: lembreteHora.value
-    });
+    };
+
+    if (editReminderId !== null) {
+      const reminder = reminders.find(item => item.id === editReminderId);
+      if (reminder) Object.assign(reminder, reminderData);
+    } else {
+      reminders.push({ id: Date.now(), ...reminderData });
+    }
 
     persistReminders();
     closeReminderModal();
@@ -336,6 +356,15 @@ document.addEventListener("DOMContentLoaded", () => {
         info.appendChild(dateTime);
       }
 
+      const reminderActions = document.createElement("div");
+      reminderActions.className = "lembrete-actions";
+
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.className = "btn blue editar-lembrete";
+      editButton.textContent = "Editar";
+      editButton.addEventListener("click", () => openReminderModal(reminder));
+
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "btn red excluir-lembrete";
@@ -345,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
         persistReminders();
       });
 
-      item.append(info, deleteButton);
+      reminderActions.append(editButton, deleteButton);
+      item.append(info, reminderActions);
       listaLembretes.appendChild(item);
     });
   }
