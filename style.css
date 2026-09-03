@@ -1,13 +1,13 @@
-
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, Arial;
+  font-family: system-ui, Arial, sans-serif;
   background: radial-gradient(circle at top, #0b1324, #05070f);
   color: #e5e7eb;
+  min-height: 100vh;
 }
 
 /* HEADER */
@@ -32,41 +32,15 @@ header {
   font-size: 14px;
 }
 
-.btn.blue {
-  background: #2563eb;
-  color: white;
-}
+.btn.blue { background: #2563eb; color: white; }
+.btn.green { background: #16a34a; color: white; }
+.btn.gray { background: #334155; color: #e5e7eb; }
+.btn.red { background: #dc2626; color: white; }
+.btn.purple { background: #7c3aed; color: white; }
+.btn.purple:hover { background: #6d28d9; }
+.btn.red:hover { background: #b91c1c; }
 
-.btn.green {
-  background: #16a34a;
-  color: white;
-}
-
-.btn.gray {
-  background: #334155;
-  color: #e5e7eb;
-}
-
-.btn.red {
-  background: #dc2626;
-  color: white;
-}
-
-/* NOVO BOTÃO DE LEMBRETE */
-.btn.purple {
-  background: #7c3aed;
-  color: white;
-}
-
-.btn.purple:hover {
-  background: #6d28d9;
-}
-
-.btn.red:hover {
-  background: #b91c1c;
-}
-
-/* CARD DE LEMBRETES */
+/* LEMBRETES */
 .lembretes-card {
   margin: 0 40px 32px;
   padding: 20px;
@@ -76,14 +50,19 @@ header {
 }
 
 .lembretes-card h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
 }
 
 #listaLembretes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+}
+
+.empty-message {
+  color: #94a3b8;
+  font-size: 14px;
+  grid-column: 1 / -1;
 }
 
 .lembrete-item {
@@ -128,6 +107,7 @@ header {
 }
 
 .coluna {
+  min-height: 220px;
   background: linear-gradient(180deg, #0f172a, #020617);
   border-radius: 14px;
   padding: 20px;
@@ -153,51 +133,38 @@ header {
   border-left: 6px solid transparent;
 }
 
-.card.red {
-  border-left-color: #ef4444;
-}
-
-.card.yellow {
-  border-left-color: #facc15;
-}
-
-.card.green {
-  border-left-color: #22c55e;
-}
+.card.red { border-left-color: #ef4444; }
+.card.yellow { border-left-color: #facc15; }
+.card.green { border-left-color: #22c55e; }
 
 .card-header {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   cursor: grab;
 }
 
 .card-title {
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .badge {
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
-.badge.Alta {
-  background: #dc2626;
-}
-
-.badge.Média {
-  background: #facc15;
-  color: #111827;
-}
-
-.badge.Baixa {
-  background: #22c55e;
-}
+.badge.Alta { background: #dc2626; }
+.badge.Média { background: #facc15; color: #111827; }
+.badge.Baixa { background: #22c55e; }
 
 .card-desc {
   font-size: 13px;
   color: #cbd5f5;
   margin-top: 6px;
+  overflow-wrap: anywhere;
 }
 
 .card-date {
@@ -207,44 +174,31 @@ header {
 }
 
 /* PROGRESSO */
-.progress-wrapper {
-  margin-top: 8px;
-}
-
+.progress-wrapper { margin-top: 8px; }
 .progress-bar {
   height: 6px;
   border-radius: 4px;
   background: #334155;
+  overflow: hidden;
 }
-
-.progress-fill {
-  height: 100%;
-  background: #22c55e;
-}
-
-.progress-text {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 4px;
-}
+.progress-fill { height: 100%; background: #22c55e; }
+.progress-text { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
 /* DETALHES */
 .details {
   font-size: 12px;
   color: #c7d2fe;
   cursor: pointer;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
-.detail-box.hidden {
-  display: none;
-}
+.detail-box.hidden, .hidden { display: none; }
 
 .check {
   font-size: 12px;
   display: flex;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .actions {
@@ -265,12 +219,11 @@ header {
   padding: 20px;
 }
 
-.hidden {
-  display: none;
-}
+.modal.hidden { display: none; }
 
 .modal-box {
   background: #020617;
+  border: 1px solid #1e293b;
   border-radius: 14px;
   padding: 24px;
   width: 420px;
@@ -289,10 +242,13 @@ header {
   color: #e5e7eb;
 }
 
-.check-row {
-  display: flex;
-  gap: 10px;
-}
+.modal-box textarea { min-height: 90px; resize: vertical; }
+
+.check-row { display: flex; gap: 10px; }
+.check-row input { margin-bottom: 12px; }
+.check-row .btn { height: 42px; }
+
+#checkPreview { margin-bottom: 12px; }
 
 .modal-actions {
   display: flex;
@@ -300,56 +256,20 @@ header {
   gap: 12px;
 }
 
-/* RESPONSIVIDADE */
 @media (max-width: 900px) {
-  header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .header-actions {
-    flex-wrap: wrap;
-  }
-
-  .kanban,
-  #listaLembretes {
-    grid-template-columns: 1fr;
-  }
+  header { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .header-actions { flex-wrap: wrap; }
+  .kanban, #listaLembretes { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
-  header {
-    padding: 20px;
-  }
-
-  .header-actions,
-  .header-actions .btn {
-    width: 100%;
-  }
-
-  .lembretes-card {
-    margin: 0 20px 24px;
-  }
-
-  .kanban {
-    padding: 0 20px 20px;
-  }
-
-  .lembrete-item {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .excluir-lembrete {
-    width: 100%;
-  }
-
-  .modal-actions {
-    flex-direction: column-reverse;
-  }
-
-  .modal-actions .btn {
-    width: 100%;
-  }
+  header { padding: 20px; }
+  .header-actions, .header-actions .btn { width: 100%; }
+  .lembretes-card { margin: 0 20px 24px; }
+  .kanban { padding: 0 20px 20px; }
+  .lembrete-item { align-items: stretch; flex-direction: column; }
+  .excluir-lembrete { width: 100%; }
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions .btn { width: 100%; }
+  .check-row { flex-direction: column; gap: 0; }
 }
